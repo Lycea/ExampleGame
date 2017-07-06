@@ -1,0 +1,3 @@
+[submodule "modules/ProceduralDungeon"]
+	path = modules/ProceduralDungeon
+	url = https://github.com/Lycea/ProceduralDungeon
