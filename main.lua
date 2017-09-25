@@ -1,9 +1,9 @@
 require "modules.ProceduralDungeon"
 require "modules.Normalizer"
-require "imgui"
+--require "imgui"
 
 --shader library ...
---require "ressources.shaders"
+require "ressources.shaders"
 
 local screen_width,screen_height
 local build_new = true
@@ -54,9 +54,6 @@ local map_canvas
   player.pos = {}
   
   
-  local resources = arg[1].."\\ressources\\"
-  local shaders = "\\shaders\\"
-  
 function love.load()
   require("mobdebug").start()
   print("hi")
@@ -69,9 +66,12 @@ function love.load()
   map_canvas:setFilter("nearest", "nearest")
   player.pos.x = 0
   player.pos.y = 0
-  str = resources..shaders.."\\minimap"
+
   
-  print(resources)
+  
+  
+    shdr_minimap = minimap.getShader()
+
   --shader_mini_map = love.graphics.newShader(str)
  -- print(shader_mini_map)
 end
@@ -193,7 +193,7 @@ end
 
 
 function love.update(dt)
-  imgui.NewFrame()
+ -- imgui.NewFrame()
   
   update_creator(dt)
   
@@ -323,7 +323,9 @@ function love.draw()
   --draw the minimap
   love.graphics.scale(0.5,0.5)
   love.graphics.translate( map_min_x or 0, map_min_y or 0)
+  --love.graphics.setShader(shdr_minimap)
     love.graphics.draw(map_canvas,0,0)
+   -- love.graphics.setShader()
     draw_player_pos()
   love.graphics.origin()
   
@@ -343,7 +345,7 @@ function love.draw()
   love.graphics.origin()
   draw_player()
   
-  imgui.Render()
+  --imgui.Render()
  end
   
 
@@ -353,20 +355,20 @@ function love.draw()
 
 function love.keypressed(key,code)
     last_key = key
-    imgui.KeyPressed(key,code)
+  --  imgui.KeyPressed(key,code)
 
 end
 
 function love.mousepressed(x,y,but,touch)
-  imgui.MousePressed(x,y,but)
+ -- imgui.MousePressed(x,y,but)
 end
 
 function love.mousemoved(x,y,dx,dy,tou)
-  imgui.MouseMoved(x,y,dx,dy)
+ -- imgui.MouseMoved(x,y,dx,dy)
 end
 
 function love.mousereleased(x,y,but)
-    imgui.MouseReleased(x,y,but)
+  --  imgui.MouseReleased(x,y,but)
 end
 
 
