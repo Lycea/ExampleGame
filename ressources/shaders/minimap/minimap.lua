@@ -1,6 +1,7 @@
 minimap = {}
 
-
+local BASE = (...)
+print(BASE)
 
 local string = [[vec4 effect( vec4 col, Image texture, vec2 texturePos, vec2 screenPos )
 {
