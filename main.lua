@@ -63,7 +63,7 @@ function love.load()
   screen_width = love.graphics.getWidth()
   screen_height = love.graphics.getHeight()
   map_canvas = love.graphics.newCanvas(love.graphics.getWidth(),love.graphics.getHeight())
-  map_canvas:setFilter("nearest", "nearest")
+  map_canvas:setFilter("nearest", "nearest",1)
   player.pos.x = 0
   player.pos.y = 0
 
@@ -100,12 +100,14 @@ end
 
 local function check_pos (x,y)
   local r, g,b  = map_image:getPixel(x,y) 
+  print("checked position: "..x.." "..y)
+  print(r.. " "..g.." "..b.." ")
   if r + g+b == 0 then
     return false
   else
     return true
   end
-  print(r.. " "..g.." "..b.." ")
+  
 end
 
 function move.left ()
@@ -149,7 +151,7 @@ finish[1]=function (module_)
           player.pos.x = rooms[room].CenterX
           player.pos.y = rooms[room].CenterY
           actual_room = rooms[room].id
-          
+          print("actual_room = "..actual_room)
           start_pos = true
         end
         
@@ -217,13 +219,31 @@ function draw_player()
   love.graphics.setColor(0xFF,0xFF,0xFF)
 end
 
+function draw_menue()
+   local m_x,m_y = love.mouse.getPosition()
+
+  love.graphics.setFont(love.graphics.newFont(35))
+  love.graphics.print("Title",screen_width/2 - screen_width/4,50)
+  
+  love.graphics.setFont(love.graphics.newFont(20))
+  love.graphics.rectangle("line",screen_width/2 - screen_width/4 - 10,20,screen_width/2,100)
+
+  
+  love.graphics.rectangle("line",screen_width/2 - screen_width/4 -10, 145+select_*50,screen_width/4,35)
+  
+  love.graphics.setColor(0,255,255,150)
+  love.graphics.rectangle("fill",screen_width/2 - screen_width/4 -10, 145+select_*50,screen_width/4,35)
+  
+  love.graphics.setColor(255,0,0,255)
+  love.graphics.print(m_x.."/"..m_y,m_x,m_y -10)
+end
 
 
 function map()
   love.graphics.setCanvas(map_canvas)
   love.graphics.clear()
-  love.graphics.setBlendMode("alpha")
-
+ -- love.graphics.setBlendMode("alpha")
+  
   
   love.graphics.setColor(0,255,0,255)
   love.graphics.setLineWidth(3)
@@ -282,7 +302,6 @@ function map()
          love.graphics.rectangle("line",rooms_n[i].x,rooms_n[i].y,rooms_n[i].width,rooms_n[i].height)
    end
    
-   love.graphics.origin()
    love.graphics.setCanvas()
 end
 
@@ -297,18 +316,9 @@ function love.draw()
   --imgui.End()
   
   love.graphics.print(DungeonCreator.GetState(),0,0)
-  love.graphics.setFont(love.graphics.newFont(35))
-  love.graphics.print("Title",screen_width/2 - screen_width/4,50)
   
-  love.graphics.setFont(love.graphics.newFont(20))
-  love.graphics.rectangle("line",screen_width/2 - screen_width/4 - 10,20,screen_width/2,100)
 
-  
-  love.graphics.rectangle("line",screen_width/2 - screen_width/4 -10, 145+select_*50,screen_width/4,35)
-  
-  love.graphics.setColor(0,255,255,150)
-  love.graphics.rectangle("fill",screen_width/2 - screen_width/4 -10, 145+select_*50,screen_width/4,35)
-  
+ 
   
   love.graphics.setColor(255,0,0,255)
   
@@ -333,19 +343,34 @@ function love.draw()
   scale_x = 1
   scale_y = 1
   
+   love.graphics.setShader(shdr_minimap)
+    love.graphics.draw(map_canvas,0,0)
+   love.graphics.setShader()
+   love.graphics.rectangle("fill",player.pos.x,player.pos.y,5,5);
+  
+  
   love.graphics.scale(1,1)
    norm_x =( player.pos.x + map_min_x ) * scale_x
    norm_y =( player.pos.y + map_min_y ) * scale_y
    
+   
+
    --print(norm_x.." "..norm_y)
   -- print(player.pos.x.." "..player.pos.y .."----".. player.pos.x +map_min_x )
   love.graphics.translate((map_min_x+(screen_width/2))-norm_x,(map_min_y+(screen_height/2))-norm_y)
   --love.graphics.translate((map_min_x+(screen_width/2))-norm_x,(map_min_y+(screen_height/2))-norm_y)
     love.graphics.draw(map_canvas,0,0)
+    
   love.graphics.origin()
   draw_player()
   
   --imgui.Render()
+
+  
+  love.graphics.origin()
+  
+  draw_menue()
+  
  end
   
 
