@@ -183,10 +183,10 @@ end
 
 
 
-function useless (dt)
+function check_keys (dt)
       if love.keyboard.isDown(last_key) and timer_move+dt > 0.04 then
         move[last_key]()
-      print(dt)
+      print(dt.. "time")
       timer_move = 0
     else
       timer_move = timer_move +dt
@@ -199,10 +199,7 @@ function love.update(dt)
   
   update_creator(dt)
   
-  
-  
-  
-  useless(dt)
+  check_keys(dt)
 
 end
 
