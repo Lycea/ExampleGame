@@ -5,6 +5,10 @@ require "modules.Normalizer"
 --shader library ...
 require "ressources.shaders"
 
+local resources = arg[1].."\\ressources\\"
+local shaders = "\\shaders\\"
+
+
 local screen_width,screen_height
 local build_new = true
 local newOptions = {
@@ -21,7 +25,7 @@ local newOptions = {
     width_circle  =  400 ,  --these both say if a dungeon will be longer or higher 
     height_circle =  200,
     
-    percent_paths_added_back = 20,   --percentage of lines addedd back after the perfect way
+    percent_paths_added_back = 20,   --percentage of lines addedd back 
   }
 
 local edges_final ,rooms,rooms_n,main_rooms
@@ -54,7 +58,63 @@ local map_canvas
   player.pos = {}
   
   
+  
+  --load a tileset/tileatlas
+function load_tileset(file,width,height)
+  
+    --not sure if line is needed could be done as temp
+    --tilesets_img[count+1]= gr.newImage(file
+    
+    local image = love.graphics.newImage(file)
+  
+    -- get hight / width of the tile atlas // image
+    local img_h = image:getHeight()
+    local img_w = image:getWidth()
+
+    -- calc rows /lines
+    local rows = img_h / height
+    local cols = img_w / width
+   
+    local count = 1
+    
+    local quadset = {}
+    
+    local x_ = 0
+    local y_ = 0
+    
+    
+    --set also the image to the set ~
+    quadset["image"] = image
+    
+    for i = 1, rows do
+       for j = 1 , cols do
+        quadset[count] = love.graphics.newQuad(x_,  y_, width, height, img_w, img_h)
+        count = count + 1
+        x_ = x_+height
+      end
+      x_ = 0
+      y_ = y_ + height
+    end
+    
+    return quadset
+end
+  
+  
+  
+  
+  
+  
+  
+  local tilesets ={}
+  
+  
 function love.load()
+  
+  
+  love.graphics.rectangle("fill",0,0,0,0)
+  love.graphics.rectangle("line",0,0,40,10)
+  love.graphics.present()
+  
   require("mobdebug").start()
   print("hi")
   DungeonCreator.setOptions(newOptions)
@@ -66,14 +126,18 @@ function love.load()
   map_canvas:setFilter("nearest", "nearest",1)
   player.pos.x = 0
   player.pos.y = 0
+  
+  love.graphics.rectangle("fill",0,0,20,10)
+  love.graphics.rectangle("line",0,0,40,10)
+  love.graphics.present()
 
   
   
   
-    shdr_minimap = minimap.getShader()
+  --load resources
+  shdr_minimap = minimap.getShader()
+  tilesets[#tilesets+1] = load_tileset("ressources/tilesets/BlueDungeon.png",32,32)
 
-  --shader_mini_map = love.graphics.newShader(str)
- -- print(shader_mini_map)
 end
 
 local timer_move = 0
@@ -307,6 +371,7 @@ end
 
 
 function love.draw()
+
   DungeonCreator.Draw()
  -- map()
   --imgui.Begin("hi")
@@ -314,8 +379,8 @@ function love.draw()
   
   love.graphics.print(DungeonCreator.GetState(),0,0)
   
+  
 
- 
   
   love.graphics.setColor(255,0,0,255)
   
@@ -367,6 +432,12 @@ function love.draw()
   love.graphics.origin()
   
   draw_menue()
+  
+  love.graphics.setColor(255,255,255,255)
+  
+  for i = 1, #tilesets[1]-1 do
+    love.graphics.draw(tilesets[1].image, tilesets[1][i], 32*(i-1),0)
+  end
   
  end
   
