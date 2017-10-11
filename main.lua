@@ -15,7 +15,7 @@ local newOptions = {
     --changeable settings
     max_width  = 20,              --max room width
     max_height = 25,              --max room height
-    mean_thresh = 0.4,           --mean_thresh - bigger than that will be main rooms
+    mean_thresh = 1.4,           --mean_thresh - bigger than that will be main rooms
     max_rooms = 50,              --max rooms , more means more rooms, more everything :P
     
     --seed options
@@ -120,8 +120,8 @@ function love.load()
   love.graphics.rectangle("line",0,0,40,10)
   love.graphics.present()
   
-  require("mobdebug").start()
-  local args = arg
+  --require("mobdebug").start()
+  --local args = arg
   
   
   DungeonCreator.setOptions(newOptions)
