@@ -300,6 +300,10 @@ function draw_menue()
   love.graphics.rectangle("line",screen_width/2 - screen_width/4 - 10,20,screen_width/2,100)
 
   
+  for i,k  in ipairs(options[1]) do
+    love.graphics.print(k,screen_width/2 - screen_width/4,100 + 50*i)
+  end
+  
   love.graphics.rectangle("line",screen_width/2 - screen_width/4 -10, 145+select_*50,screen_width/4,35)
   
   love.graphics.setColor(0,255,255,150)
@@ -392,9 +396,7 @@ function love.draw()
   
   love.graphics.setColor(255,0,0,255)
   
-  for i,k  in ipairs(options[1]) do
-    love.graphics.print(k,screen_width/2 - screen_width/4,100 + 50*i)
-  end
+
   
   --reset colors and stuff before drawing a canvas... else it will look kinda strange
    love.graphics.setBlendMode("alpha")
@@ -439,7 +441,7 @@ function love.draw()
   
   love.graphics.origin()
   
-  draw_menue()
+ -- draw_menue()
   
   love.graphics.setColor(255,255,255,255)
   
@@ -455,8 +457,10 @@ function love.draw()
 
 
 function love.keypressed(key,code)
+  if key == "left" or key == "right" or key == "up" or key == "down" then
     last_key = key
   --  imgui.KeyPressed(key,code)
+  end
 
 end
 
