@@ -6,7 +6,7 @@ require "modules.Normalizer"
 require "ressources.shaders"
 
 local resources = arg[1].."\\ressources\\"
-local shaders = "\\shaders\\"
+local shaders = "shaders\\"
 
 
 local screen_width,screen_height
@@ -15,7 +15,7 @@ local newOptions = {
     --changeable settings
     max_width  = 20,              --max room width
     max_height = 25,              --max room height
-    mean_thresh = 1.4,           --mean_thresh - bigger than that will be main rooms
+    mean_thresh = 0.4,           --mean_thresh - bigger than that will be main rooms
     max_rooms = 50,              --max rooms , more means more rooms, more everything :P
     
     --seed options
@@ -54,9 +54,14 @@ local map_canvas
 
 
   
-  local player = {}
-  player.pos = {}
+local player = {}
+player.pos = {}
   
+local timer_move = 0
+local creator_state = 1
+  
+  
+  --create a table from a image
   
   
   --load a tileset/tileatlas
@@ -116,9 +121,10 @@ function love.load()
   love.graphics.present()
   
   require("mobdebug").start()
-  print("hi")
+  local args = arg
+  
+  
   DungeonCreator.setOptions(newOptions)
-  print(text)
   DungeonCreator.newDungeon()
   screen_width = love.graphics.getWidth()
   screen_height = love.graphics.getHeight()
@@ -140,8 +146,7 @@ function love.load()
 
 end
 
-local timer_move = 0
-local creator_state = 1
+
 
 
 local move   = {}
@@ -163,6 +168,11 @@ end
 
 
 local function check_pos (x,y)
+  
+  if map_image == 0 then
+    return false
+  end
+  
   local r, g,b  = map_image:getPixel(x,y) 
   print("checked position: "..x.." "..y)
   print(r.. " "..g.." "..b.." ")
@@ -304,7 +314,7 @@ function map()
   love.graphics.setCanvas(map_canvas)
   love.graphics.clear()
  -- love.graphics.setBlendMode("alpha")
-  
+ -- love.graphics.translate(map_min_x*-1,map_min_y*-1)
   
   love.graphics.setColor(0,255,0,255)
   love.graphics.setLineWidth(3)
@@ -363,6 +373,7 @@ function map()
          love.graphics.rectangle("line",rooms_n[i].x,rooms_n[i].y,rooms_n[i].width,rooms_n[i].height)
    end
    
+--   love.graphics.origin()
    love.graphics.setCanvas()
 end
 
@@ -373,11 +384,8 @@ end
 function love.draw()
 
   DungeonCreator.Draw()
- -- map()
-  --imgui.Begin("hi")
-  --imgui.End()
   
-  love.graphics.print(DungeonCreator.GetState(),0,0)
+  love.graphics.print(DungeonCreator.GetState(),0,20)
   
   
 
@@ -435,9 +443,9 @@ function love.draw()
   
   love.graphics.setColor(255,255,255,255)
   
-  for i = 1, #tilesets[1]-1 do
-    love.graphics.draw(tilesets[1].image, tilesets[1][i], 32*(i-1),0)
-  end
+ -- for i = 1, #tilesets[1]-1 do
+ --   love.graphics.draw(tilesets[1].image, tilesets[1][i], 32*(i-1),0)
+ -- end
   
  end
   
