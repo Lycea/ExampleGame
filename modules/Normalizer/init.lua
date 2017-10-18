@@ -12,5 +12,5 @@ assert(not BASE:match('%.init%.$'), "Invalid require path `"..(...).."' (drop th
 
 return {
   
-	DungeonCreator = require(BASE .. 'normalizer'),
+	Normalizer = require(BASE .. 'normalizer'),
 }

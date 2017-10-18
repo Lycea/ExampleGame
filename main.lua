@@ -9,8 +9,7 @@ local resources = arg[1].."\\ressources\\"
 local shaders = "shaders\\"
 
 
-local screen_width,screen_height
-local build_new = true
+-- settings for the to be created dungeon
 local newOptions = {
     --changeable settings
     max_width  = 20,              --max room width
@@ -28,6 +27,13 @@ local newOptions = {
     percent_paths_added_back = 20,   --percentage of lines addedd back 
   }
 
+
+
+local screen_width,screen_height
+local build_new = true
+
+
+
 local edges_final ,rooms,rooms_n,main_rooms
 local select_ = 0
 local sel_option = 0
@@ -37,8 +43,6 @@ local map_image = 0
 
 local actual_room = 0
 
--- dungeon generation stuff
-local do_it = true
 local dungeon = DungeonCreator
 
 local last_key = "enter"
@@ -51,7 +55,7 @@ local options = {
 
 
 local map_canvas
-
+local map_tiles
 
   
 local player = {}
@@ -120,7 +124,7 @@ function love.load()
   love.graphics.rectangle("line",0,0,40,10)
   love.graphics.present()
   
-  --require("mobdebug").start()
+  require("mobdebug").start()
   --local args = arg
   
   
@@ -143,6 +147,7 @@ function love.load()
   --load resources
   shdr_minimap = minimap.getShader()
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/BlueDungeon.png",32,32)
+  tilesets[#tilesets+1] = load_tileset("ressources/tilesets/CharsTiles.png",32,32)
 
 end
 
@@ -210,6 +215,9 @@ function move.down()
 end
 
 
+
+local dungeon1 = love.graphics.newCanvas(10,10)
+
 -- returns the finished dungeon and sets state to normalizer or whatever is needed next
 finish[1]=function (module_)
     edges_final,rooms,rooms_n,main_rooms= module_.GetDungeon()
@@ -238,20 +246,26 @@ finish[2]=function (module_)
     map_min_x = map_min_x*-1
     map_min_y = map_min_y*-1
     creator_state = 3
-    --dungeon = normalizer
+    
+    
+    module_.SetTileset(tilesets[1])
+    dungeon1= module_.SetTiles()
     dungeon = dummy
     map()
     
     map_image = map_canvas:newImageData()
+    
+  
 end
 
 
 
-
+--update function for the creation of a new dungeon
 function update_creator(dt)
-  dungeon.Update(dt)
-  if dungeon.GetState() == "finished"then
+   if dungeon.GetState() == "finished"then
     finish[creator_state](dungeon)
+  else
+     dungeon.Update(dt)
   end
 end
 
@@ -281,13 +295,24 @@ function draw_player_pos()
   love.graphics.setColor(0,0,255)
  love.graphics.points(player.pos.x,player.pos.y)
  love.graphics.setColor(0xFF,0xFF,0xFF)
+ 
+ 
+  -- for i = 1, #tilesets[1]-1 do
+ --   love.graphics.draw(tilesets[1].image, tilesets[1][i], 32*(i-1),0)
+ -- end
+ 
+ 
 end
 
 function draw_player()
   love.graphics.setColor(0,0,255)
   love.graphics.rectangle("fill",screen_width/2,screen_height/2,5,5)
   love.graphics.points(screen_width/2, screen_height/2)
+  
+
+  
   love.graphics.setColor(0xFF,0xFF,0xFF)
+  --love.graphics.draw(tilesets[2].image,tilesets[2][1],player.pos.x,player.pos.y)
 end
 
 function draw_menue()
@@ -347,7 +372,7 @@ function map()
        love.graphics.rectangle("line",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
        
        love.graphics.setColor(255,255,255,255)
-       love.graphics.print(rooms[i].id,rooms[i].CenterX,rooms[i].CenterY)
+       --love.graphics.print(rooms[i].id,rooms[i].CenterX,rooms[i].CenterY)
      else
        
        if rooms[i].isHall == true then
@@ -380,7 +405,8 @@ function map()
 --   love.graphics.origin()
    love.graphics.setCanvas()
 end
-
+norm_x = 0
+norm_y = 0
 
 
 
@@ -391,6 +417,7 @@ function love.draw()
   
   love.graphics.print(DungeonCreator.GetState(),0,20)
   
+  love.graphics.print(love.timer.getFPS(),100,0)
   
 
   
@@ -401,7 +428,11 @@ function love.draw()
   --reset colors and stuff before drawing a canvas... else it will look kinda strange
    love.graphics.setBlendMode("alpha")
    love.graphics.setColor(255, 255, 255, 255)
-
+    
+  love.graphics.translate(norm_x,norm_y)
+   love.graphics.draw(dungeon1,0,0)
+  love.graphics.origin()
+  
   --draw the minimap
   love.graphics.scale(0.5,0.5)
   love.graphics.translate( map_min_x or 0, map_min_y or 0)
