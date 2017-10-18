@@ -124,7 +124,7 @@ function love.load()
   love.graphics.rectangle("line",0,0,40,10)
   love.graphics.present()
   
-  require("mobdebug").start()
+ -- require("mobdebug").start()
   --local args = arg
   
   
@@ -254,6 +254,13 @@ finish[2]=function (module_)
     map()
     
     map_image = map_canvas:newImageData()
+    
+    local start = love.timer.getTime()
+    for i = 1 , 21000 do
+      map_image:getPixel(1,1)
+    end
+    local stop = love.timer.getTime()
+    print(stop-start)
     
   
 end

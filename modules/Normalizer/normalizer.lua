@@ -33,11 +33,11 @@ norm[1] = function ()
   for i, room in ipairs(data_in.main) do
     if room.x < min_x then
       min_x = room.x
-      print(min_x)
+     -- print(min_x)
     end
     if room.y < min_y then
       min_y = room.y
-      print(min_y)
+     -- print(min_y)
     end
     
   end
@@ -74,8 +74,17 @@ local tile_lookup = {
 local max_cols = 0
 local max_rows = 0
 
+
+local checkable_points = {}
+
 norm[2] = function ()
   local start = love.timer.getTime()
+  
+  --first append both tables for only one loop with all rooms
+  for i, room in  ipairs(data_in.main) do
+      data_in.rooms[#data_in.rooms+1]=room
+  end
+  
   
   --adjust all data to min x and y and return table
   for i,room in ipairs(data_in.rooms) do
@@ -86,7 +95,6 @@ norm[2] = function ()
             lookup_table[(room.y-min_y)+j] = {}
             setmetatable(lookup_table[(room.y-min_y)+j],meta_map)
             lookup_table[(room.y-min_y)+j][0] = 0
-          --  print("1.add new line ")
         end
         lookup_table[(room.y-min_y)+j][(room.x-min_x)+k] = 1
         love.graphics.points((room.x-min_x)+k,(room.y-min_y)+j)
@@ -94,30 +102,13 @@ norm[2] = function ()
           max_cols = (room.x-min_x)+k
         end
         
-       -- love.graphics.points((room.x-min_x)+k,(room.y-min_y)+j)
+        checkable_points[#checkable_points +1] = {}
+        checkable_points[#checkable_points].x = k
+        checkable_points[#checkable_points].y = j
       end
     end
   end
   
-  for i, room in ipairs(data_in.main) do
-    for j = 1,room.height+1 do
-      for k = 1,room.width+1 do
-        -- add 1 to table at position
-        if lookup_table[(room.y-min_y)+j] == nil then
-          lookup_table[(room.y-min_y)+j] = {}
-          setmetatable(lookup_table[(room.y-min_y)+j],meta_map)
-          lookup_table[(room.y-min_y)+j][0] = 0
-        end
-        lookup_table[(room.y-min_y)+j][(room.x-min_x)+k] = 1
-        
-        love.graphics.points((room.x-min_x)+k,(room.y-min_y)+j)
-        if (room.x-min_x)+k > max_cols then
-          max_cols = (room.x-min_x)+k
-        end
-       
-      end
-    end
-  end
   print(#lookup_table)
   lookup_table[0] ={}
   setmetatable(lookup_table[0],meta_map)
@@ -126,20 +117,6 @@ norm[2] = function ()
   setmetatable(lookup_table[#lookup_table],meta_map)
   
   love.graphics.setColor(0,0xff,0,0xff)
-
-  --print(max_cols)
-  --TODO: Put this in a seperate third function later because of the long time it takes, depending on later setup.
-  --Well not needed cause metatables are funky
-  if debug_ then
-    for i = 1, #lookup_table-1 do
-      for j=1, max_cols do
-        if lookup_table[i][j] == nil then
-          lookup_table[i][j] = 0
-          love.graphics.points(j,i)
-        end
-      end
-    end
-  end
   
   
   local end_t = love.timer.getTime()
@@ -160,54 +137,19 @@ norm[3] = function ()
   index_table = {}
   -- check  the naighbours of each available cell
   local map = lookup_table
-  for i =1 ,#map -1 do 
-    for j=1,max_cols do
+  for i ,point in ipairs(checkable_points) do
       --get other cells
-      local meta ={
-        __pow = function(t,other) 
-          
-          local tab = {}
-          tab.sum = 0
-          for k=1,8 do
-           -- print(t[k]or 0 .."  "..k)
-            --print(t[k]== nil and 0 or 2^(k-1))
-            tab[k] =t[k]== 0 and 0 or 2^(k-1)
-            tab.sum= tab.sum+tab[k]
-          end
-          
-          --print(tab.sum)
-          return  tab
-        end, 
-      }
-      
-
-      if map[i][j] ~=0 then
-        
-     --  print(i.." "..j)
-        local n = {}
-        setmetatable(n,meta)
-       -- setmetatable(map,meta_map)
-
-          n[1] = map[i-1][j] or 0
-          n[2] = map[i-1][j+1] or 0
-          n[3] = map[i][j+1] or 0
-          n[4] = map[i+1][j+1] or 0
-          n[5] = map[i+1][j]or 0
-          n[6] = map[i+1][j-1]or 0
-          n[7] = map[i][j-1]or 0
-          n[8] = map[i-1][j-1]or 0
          
-         local m= n^1
-         lookup_table[i][j] =  tile_lookup[m.sum] -- has to be the number in the tile table
-         --if index_table[m.sum] == nil then
-           --index_table[m.sum] = 1
-         --end
+         local sum = (map[point.x][point.y] == 0 and 0 or 2^0)+
+          (map[point.x-1][point.y+1] == 0 and 0 or 2^1)+
+          (map[point.x][point.y+1] == 0 and 0 or 2^2)+
+          (map[point.x+1][point.y+1]== 0 and 0 or 2^3)+
+          (map[point.x+1][point.y]== 0 and 0 or 2^4)+
+          (map[point.x+1][point.y-1]==0 and 0 or 2^5)+
+          (map[point.x][point.y-1]==0 and 0 or 2^6)+
+          (map[point.x-1][point.y-1]==0 and 0 or 2^7)
          
-       --  love.graphics.setColor(test.sum,0,0,255)
-       --  love.graphics.points(j,i)
-       --  love.graphics.present()
-     end
-    end
+         lookup_table[point.x][point.y] =  tile_lookup[sum] -- has to be the number in the tile table
   end
   
   love.graphics.present()
@@ -224,6 +166,8 @@ end
 local tileset
 
 function normalizer.SetTiles()
+  print(max_cols)
+  print(#lookup_table)
   local canvas = love.graphics.newCanvas(32*(max_cols+100),32*#lookup_table)
   love.graphics.setCanvas(canvas)
   for i=1,#lookup_table-1 do
