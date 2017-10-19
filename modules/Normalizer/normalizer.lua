@@ -69,7 +69,26 @@ local tile_lookup = {
   [249] = 5,
   [252] = 3,
   [253] = 11,
-  [255] = 17
+  [255] = 17,
+  [0] = 17,
+  [5]= 17,
+  [8]= 17,
+  [13]= 17,
+  [29]= 17,
+  [30]= 17,
+  [32]= 17,
+  [37]= 17,
+  [48]= 17,
+  [49]= 17,
+  [53]= 17,
+  [57]= 17,
+  [61]= 17,
+  [113]= 17,
+  [125]= 17,
+  [127]= 17,
+  [133]= 17,
+  [197]= 17
+  
   }
 local max_cols = 0
 local max_rows = 0
@@ -103,8 +122,8 @@ norm[2] = function ()
         end
         
         checkable_points[#checkable_points +1] = {}
-        checkable_points[#checkable_points].x = k
-        checkable_points[#checkable_points].y = j
+        checkable_points[#checkable_points].x = (room.x-min_x)+k
+        checkable_points[#checkable_points].y = (room.y-min_y)+j
       end
     end
   end
@@ -123,8 +142,7 @@ norm[2] = function ()
   print(end_t-start.." "..end_t.." "..start)
   
   love.graphics.present()
- -- local data=love.graphics.newScreenshot()
- -- data:encode("png","test.png")
+
   
   
   norm_step = norm_step +1
@@ -136,21 +154,54 @@ norm[3] = function ()
   local start = love.timer.getTime()
   index_table = {}
   -- check  the naighbours of each available cell
-  local map = lookup_table
-  for i ,point in ipairs(checkable_points) do
-      --get other cells
-         
-         local sum = (map[point.x][point.y] == 0 and 0 or 2^0)+
-          (map[point.x-1][point.y+1] == 0 and 0 or 2^1)+
-          (map[point.x][point.y+1] == 0 and 0 or 2^2)+
-          (map[point.x+1][point.y+1]== 0 and 0 or 2^3)+
-          (map[point.x+1][point.y]== 0 and 0 or 2^4)+
-          (map[point.x+1][point.y-1]==0 and 0 or 2^5)+
-          (map[point.x][point.y-1]==0 and 0 or 2^6)+
-          (map[point.x-1][point.y-1]==0 and 0 or 2^7)
-         
-         lookup_table[point.x][point.y] =  tile_lookup[sum] -- has to be the number in the tile table
+  
+    fi = io.open("table_before.csv","w")
+  for i =0, #lookup_table do
+    for j = 0, max_cols do
+      fi:write(lookup_table[i][j]..";")
+    end
+    fi:write("\n")
   end
+  io.close(fi)
+  
+  lookup_tile = {}
+  local map = lookup_table
+  for i=1 , #checkable_points do
+      --get other cells
+      
+      local point = checkable_points[i]
+         local sum = (map[point.y][point.x] == 0 and 0 or 2^0)+
+          (map[point.y-1][point.x+1] == 0 and 0 or 2^1)+
+          (map[point.y][point.x+1] == 0 and 0 or 2^2)+
+          (map[point.y+1][point.x+1]== 0 and 0 or 2^3)+
+          (map[point.y+1][point.x]== 0 and 0 or 2^4)+
+          (map[point.y+1][point.x-1]==0 and 0 or 2^5)+
+          (map[point.y][point.x-1]==0 and 0 or 2^6)+
+          (map[point.y-1][point.x-1]==0 and 0 or 2^7)
+         love.graphics.setColor(255,0,0,255)
+          love.graphics.points(point.x+min_x,point.y+min_y)
+        -- love.graphics.present()
+         if sum == 0 then
+        --   love.graphics.points(point.x+min_x,point.y+min_y)
+         print("zero")  
+         end
+         
+         lookup_table[point.y][point.x] =  tile_lookup[sum] -- has to be the number in the tile table
+         
+         lookup_tile[sum] = true
+  end
+  
+  
+  --write the table to a temp file for testing ...
+  fi = io.open("table_after.csv","w")
+  for i =0, #lookup_table do
+    for j = 0, max_cols do
+      fi:write(lookup_table[i][j]..";")
+    end
+    fi:write("\n")
+  end
+  io.close(fi)
+  
   
   love.graphics.present()
   
@@ -168,19 +219,44 @@ local tileset
 function normalizer.SetTiles()
   print(max_cols)
   print(#lookup_table)
-  local canvas = love.graphics.newCanvas(32*(max_cols+100),32*#lookup_table)
-  love.graphics.setCanvas(canvas)
-  for i=1,#lookup_table-1 do
-    for j=1, max_cols do
-      --draw the image
-      if lookup_table[i][j] ~= 0 then
-          love.graphics.draw(tileset.image,tileset[lookup_table[i][j]],(i-1)*32,(j-1)*32)
-      end
-    end
-  end
   
-  love.graphics.setCanvas()
-  return canvas
+  
+--  local canvas = love.graphics.newCanvas(32*(max_cols+100),32*#lookup_table)
+--  love.graphics.setCanvas(canvas)
+--  for i=1,#lookup_table-1 do
+--    for j=1, max_cols do
+--      --draw the image
+--      if lookup_table[i][j] ~= 0 then
+--          love.graphics.draw(tileset.image,tileset[lookup_table[i][j]],(i-1)*32,(j-1)*32)
+--      end
+--    end
+--  end
+  
+ -- love.graphics.setCanvas()
+ 
+  --local counts = 0
+  --local tilesetBatch = love.graphics.newSpriteBatch(tileset.image, #checkable_points)
+  --for i=1,#lookup_table-1 do
+--    for j=1, max_cols do
+--      if lookup_table[i][j] ~= 0 then
+--      tilesetBatch:add(tileset[lookup_table[i][j]], (j-1)*32,(i-1)*32)
+--      counts = counts+1
+--      end
+--    end 
+--  end
+    local tilesetBatch = love.graphics.newSpriteBatch(tileset.image, #checkable_points)
+    for i=1 , #checkable_points do
+      --get other cells
+      
+      local point = checkable_points[i]
+      tilesetBatch:add(tileset[lookup_table[point.y][point.x]], (point.x-1)*32,(point.y-1)*32)
+    end
+    
+  
+  
+  print(counts)
+  tilesetBatch:flush()
+  return tilesetBatch
 end
 
 

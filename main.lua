@@ -124,7 +124,7 @@ function love.load()
   love.graphics.rectangle("line",0,0,40,10)
   love.graphics.present()
   
- -- require("mobdebug").start()
+  --require("mobdebug").start()
   --local args = arg
   
   
@@ -436,7 +436,8 @@ function love.draw()
    love.graphics.setBlendMode("alpha")
    love.graphics.setColor(255, 255, 255, 255)
     
-  love.graphics.translate(norm_x,norm_y)
+  --love.graphics.translate(norm_x,norm_y)
+  love.graphics.scale( 0.2,0.2)
    love.graphics.draw(dungeon1,0,0)
   love.graphics.origin()
   
