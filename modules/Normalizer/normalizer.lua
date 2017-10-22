@@ -220,30 +220,6 @@ function normalizer.SetTiles()
   print(max_cols)
   print(#lookup_table)
   
-  
---  local canvas = love.graphics.newCanvas(32*(max_cols+100),32*#lookup_table)
---  love.graphics.setCanvas(canvas)
---  for i=1,#lookup_table-1 do
---    for j=1, max_cols do
---      --draw the image
---      if lookup_table[i][j] ~= 0 then
---          love.graphics.draw(tileset.image,tileset[lookup_table[i][j]],(i-1)*32,(j-1)*32)
---      end
---    end
---  end
-  
- -- love.graphics.setCanvas()
- 
-  --local counts = 0
-  --local tilesetBatch = love.graphics.newSpriteBatch(tileset.image, #checkable_points)
-  --for i=1,#lookup_table-1 do
---    for j=1, max_cols do
---      if lookup_table[i][j] ~= 0 then
---      tilesetBatch:add(tileset[lookup_table[i][j]], (j-1)*32,(i-1)*32)
---      counts = counts+1
---      end
---    end 
---  end
     local tilesetBatch = love.graphics.newSpriteBatch(tileset.image, #checkable_points)
     for i=1 , #checkable_points do
       --get other cells

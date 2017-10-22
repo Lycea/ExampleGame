@@ -118,13 +118,21 @@ end
   
   
 function love.load()
-  
+  for i ,argu in ipairs(arg) do
+      print (argu)
+      if argu == "-debug" then
+         require("mobdebug").start()   
+      end
+  end
   
   love.graphics.rectangle("fill",0,0,0,0)
   love.graphics.rectangle("line",0,0,40,10)
   love.graphics.present()
   
-  --require("mobdebug").start()
+  
+  
+
+  
   --local args = arg
   
   
@@ -436,10 +444,10 @@ function love.draw()
    love.graphics.setBlendMode("alpha")
    love.graphics.setColor(255, 255, 255, 255)
     
-  --love.graphics.translate(norm_x,norm_y)
-  love.graphics.scale( 0.2,0.2)
+ -- love.graphics.translate()
+  --love.graphics.scale( 0.2,0.2)
    love.graphics.draw(dungeon1,0,0)
-  love.graphics.origin()
+ -- love.graphics.origin()
   
   --draw the minimap
   love.graphics.scale(0.5,0.5)
