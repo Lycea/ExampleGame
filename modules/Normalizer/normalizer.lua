@@ -155,14 +155,14 @@ norm[3] = function ()
   index_table = {}
   -- check  the naighbours of each available cell
   
-    fi = io.open("table_before.csv","w")
-  for i =0, #lookup_table do
-    for j = 0, max_cols do
-      fi:write(lookup_table[i][j]..";")
-    end
-    fi:write("\n")
-  end
-  io.close(fi)
+--    fi = io.open("table_before.csv","w")
+--  for i =0, #lookup_table do
+--    for j = 0, max_cols do
+--      fi:write(lookup_table[i][j]..";")
+--    end
+--    fi:write("\n")
+--  end
+--  io.close(fi)
   
   lookup_tile = {}
   local map = lookup_table
@@ -193,14 +193,14 @@ norm[3] = function ()
   
   
   --write the table to a temp file for testing ...
-  fi = io.open("table_after.csv","w")
-  for i =0, #lookup_table do
-    for j = 0, max_cols do
-      fi:write(lookup_table[i][j]..";")
-    end
-    fi:write("\n")
-  end
-  io.close(fi)
+--  fi = io.open("table_after.csv","w")
+--  for i =0, #lookup_table do
+--    for j = 0, max_cols do
+--      fi:write(lookup_table[i][j]..";")
+--    end
+--    fi:write("\n")
+--  end
+--  io.close(fi)
   
   
   love.graphics.present()
