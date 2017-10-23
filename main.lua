@@ -444,10 +444,11 @@ function love.draw()
    love.graphics.setBlendMode("alpha")
    love.graphics.setColor(255, 255, 255, 255)
     
- -- love.graphics.translate()
+  love.graphics.translate(-norm_x*32 +screen_width/2-32*2,-norm_y*32+(screen_height/2-32*2))
+  print(norm_x,norm_x)
   --love.graphics.scale( 0.2,0.2)
    love.graphics.draw(dungeon1,0,0)
- -- love.graphics.origin()
+  love.graphics.origin()
   
   --draw the minimap
   love.graphics.scale(0.5,0.5)
@@ -469,6 +470,7 @@ function love.draw()
   
   
   love.graphics.scale(1,1)
+  
    norm_x =( player.pos.x + map_min_x ) * scale_x
    norm_y =( player.pos.y + map_min_y ) * scale_y
    
