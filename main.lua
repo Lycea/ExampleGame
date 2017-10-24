@@ -324,14 +324,16 @@ function draw_player_pos()
 end
 
 function draw_player()
-  love.graphics.setColor(0,0,255)
-  love.graphics.rectangle("fill",screen_width/2,screen_height/2,5,5)
-  love.graphics.points(screen_width/2, screen_height/2)
+  --love.graphics.setColor(0,0,255)
+ -- love.graphics.rectangle("fill",screen_width/2,screen_height/2,5,5)
+  --love.graphics.points(screen_width/2, screen_height/2)
   
+  
+  love.graphics.setColor(0xFF,0xFF,0xFF)
   --love.graphics.draw(tilesets[2].image,tilesets[2][1],player.pos.x,player.pos.y)
   love.graphics.draw(tilesets[2].image,tilesets[2][1],screen_width/2,screen_height/2)
   
-  love.graphics.setColor(0xFF,0xFF,0xFF)
+  
 
 end
 
