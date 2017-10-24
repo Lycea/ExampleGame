@@ -12,17 +12,17 @@ local shaders = "shaders\\"
 -- settings for the to be created dungeon
 local newOptions = {
     --changeable settings
-    max_width  = 20,              --max room width
-    max_height = 25,              --max room height
+    max_width  = 10,              --max room width
+    max_height = 10,              --max room height
     mean_thresh = 1.4,           --mean_thresh - bigger than that will be main rooms
-    max_rooms = 50,              --max rooms , more means more rooms, more everything :P
+    max_rooms = 70,              --max rooms , more means more rooms, more everything :P
     
     --seed options
     useSeed   = true,            --do you want to create a special seed ?
     seed      = 02,                --which seed should that be :p
     
-    width_circle  =  400 ,  --these both say if a dungeon will be longer or higher 
-    height_circle =  200,
+    width_circle  =  200 ,  --these both say if a dungeon will be longer or higher 
+    height_circle =  100,
     
     percent_paths_added_back = 20,   --percentage of lines addedd back 
   }
@@ -181,43 +181,47 @@ end
 
 
 local function check_pos (x,y)
-  
-  if map_image == 0 then
+  print(x.." "..y)
+   if map_image == 0 then
     return false
   end
+
+  return normalizer.CheckPoint(x,y)
   
-  local r, g,b  = map_image:getPixel(x,y) 
-  print("checked position: "..x.." "..y)
-  print(r.. " "..g.." "..b.." ")
-  if r + g+b == 0 then
-    return false
-  else
-    return true
-  end
+ 
+  
+--  local r, g,b  = map_image:getPixel(x,y) 
+--  print("checked position: "..x.." "..y)
+--  print(r.. " "..g.." "..b.." ")
+--  if r + g+b == 0 then
+--    return false
+--  else
+--    return true
+--  end
   
 end
 
 function move.left ()
-  if check_pos(player.pos.x-1,player.pos.y) == true then
+  if check_pos(norm_x-1,norm_y) == true then
     player.pos.x = player.pos.x -1
   end
 end
 
 function move.right ()
   
-  if check_pos(player.pos.x+1,player.pos.y)== true then
+  if check_pos(norm_x+1,norm_y)== true then
     player.pos.x = player.pos.x +1
   end
 end
 
 function move.up ()
-  if check_pos(player.pos.x,player.pos.y-1) then
+  if check_pos(norm_x,norm_y-1) then
     player.pos.y = player.pos.y -1  
   end
 end
 
 function move.down()
-  if check_pos(player.pos.x,player.pos.y+1) then
+  if check_pos(norm_x,norm_y +1) then
     player.pos.y = player.pos.y +1
   end
 end
@@ -324,10 +328,11 @@ function draw_player()
   love.graphics.rectangle("fill",screen_width/2,screen_height/2,5,5)
   love.graphics.points(screen_width/2, screen_height/2)
   
-
+  --love.graphics.draw(tilesets[2].image,tilesets[2][1],player.pos.x,player.pos.y)
+  love.graphics.draw(tilesets[2].image,tilesets[2][1],screen_width/2,screen_height/2)
   
   love.graphics.setColor(0xFF,0xFF,0xFF)
-  --love.graphics.draw(tilesets[2].image,tilesets[2][1],player.pos.x,player.pos.y)
+
 end
 
 function draw_menue()
@@ -357,7 +362,7 @@ end
 function map()
   love.graphics.setCanvas(map_canvas)
   love.graphics.clear()
- -- love.graphics.setBlendMode("alpha")
+  love.graphics.setBlendMode("alpha")
  -- love.graphics.translate(map_min_x*-1,map_min_y*-1)
   
   love.graphics.setColor(0,255,0,255)
@@ -384,26 +389,13 @@ function map()
        love.graphics.rectangle("fill",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
     
        love.graphics.setColor(255,0,0,255)
-       love.graphics.rectangle("line",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
+       --love.graphics.rectangle("line",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
        
        love.graphics.setColor(255,255,255,255)
        --love.graphics.print(rooms[i].id,rooms[i].CenterX,rooms[i].CenterY)
      else
        
-       if rooms[i].isHall == true then
-         love.graphics.setColor(255,255,255,255)
-       
-       
-         love.graphics.setColor(0,0,200,200)
-         
-         love.graphics.rectangle("fill",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
-      
-         love.graphics.setColor(0,0,200,255)
-         love.graphics.rectangle("line",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
-         
-       else
 
-       end
       love.graphics.setColor(255,255,255,200)
     end
    end
@@ -444,8 +436,8 @@ function love.draw()
    love.graphics.setBlendMode("alpha")
    love.graphics.setColor(255, 255, 255, 255)
     
-  love.graphics.translate(-norm_x*32 +screen_width/2-32*2,-norm_y*32+(screen_height/2-32*2))
-  print(norm_x,norm_x)
+  love.graphics.translate(-norm_x*32 +screen_width/2 +32,-norm_y*32+(screen_height/2)+32)
+  --print(norm_x,norm_x)
   --love.graphics.scale( 0.2,0.2)
    love.graphics.draw(dungeon1,0,0)
   love.graphics.origin()
@@ -478,11 +470,11 @@ function love.draw()
 
    --print(norm_x.." "..norm_y)
   -- print(player.pos.x.." "..player.pos.y .."----".. player.pos.x +map_min_x )
-  love.graphics.translate((map_min_x+(screen_width/2))-norm_x,(map_min_y+(screen_height/2))-norm_y)
   --love.graphics.translate((map_min_x+(screen_width/2))-norm_x,(map_min_y+(screen_height/2))-norm_y)
-    love.graphics.draw(map_canvas,0,0)
+  --love.graphics.translate((map_min_x+(screen_width/2))-norm_x,(map_min_y+(screen_height/2))-norm_y)
+    --love.graphics.draw(map_canvas,0,0)
     
-  love.graphics.origin()
+  --love.graphics.origin()
   draw_player()
   
   --imgui.Render()

@@ -51,10 +51,13 @@ end
 local tile_lookup = {
   [7]   = 7,
   [28]  = 2,
+  [29]  = 2, --??
   [31]  = 8,
   [63]  = 8,
   [112] = 4,
+  [113] = 4,
   [124] = 3,
+  [125] = 3, --?
   [126] = 3,
   [127] = 13,
   [159] = 8,
@@ -70,25 +73,7 @@ local tile_lookup = {
   [252] = 3,
   [253] = 11,
   [255] = 17,
-  [0] = 17,
-  [5]= 17,
-  [8]= 17,
-  [13]= 17,
-  [29]= 17,
-  [30]= 17,
-  [32]= 17,
-  [37]= 17,
-  [48]= 17,
-  [49]= 17,
-  [53]= 17,
-  [57]= 17,
-  [61]= 17,
-  [113]= 17,
-  [125]= 17,
-  [127]= 17,
-  [133]= 17,
-  [197]= 17
-  
+  [0]   = 17,
   }
 local max_cols = 0
 local max_rows = 0
@@ -150,20 +135,11 @@ norm[2] = function ()
 end
 
 
+
+
 norm[3] = function ()
   local start = love.timer.getTime()
   index_table = {}
-  -- check  the naighbours of each available cell
-  
---    fi = io.open("table_before.csv","w")
---  for i =0, #lookup_table do
---    for j = 0, max_cols do
---      fi:write(lookup_table[i][j]..";")
---    end
---    fi:write("\n")
---  end
---  io.close(fi)
-  
   lookup_tile = {}
   local map = lookup_table
   for i=1 , #checkable_points do
@@ -179,7 +155,7 @@ norm[3] = function ()
           (map[point.y][point.x-1]==0 and 0 or 2^6)+
           (map[point.y-1][point.x-1]==0 and 0 or 2^7)
          love.graphics.setColor(255,0,0,255)
-          love.graphics.points(point.x+min_x,point.y+min_y)
+          --love.graphics.points(point.x+min_x,point.y+min_y)
         -- love.graphics.present()
          if sum == 0 then
         --   love.graphics.points(point.x+min_x,point.y+min_y)
@@ -190,17 +166,6 @@ norm[3] = function ()
          
          lookup_tile[sum] = true
   end
-  
-  
-  --write the table to a temp file for testing ...
---  fi = io.open("table_after.csv","w")
---  for i =0, #lookup_table do
---    for j = 0, max_cols do
---      fi:write(lookup_table[i][j]..";")
---    end
---    fi:write("\n")
---  end
---  io.close(fi)
   
   
   love.graphics.present()
@@ -235,6 +200,15 @@ function normalizer.SetTiles()
   return tilesetBatch
 end
 
+function normalizer.CheckPoint(x,y)
+  
+  print(lookup_table[y][x])
+  
+  if lookup_table[y][x] == 17  then
+    return true
+  end
+  return false
+end
 
 
 function normalizer.GetState()
