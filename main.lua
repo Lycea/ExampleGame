@@ -65,6 +65,8 @@ local timer_move = 0
 local creator_state = 1
   
   
+local map_width  = 0
+local map_height = 0
   --create a table from a image
   
   
@@ -255,6 +257,8 @@ end
 
 finish[2]=function (module_)
     map_min_x, map_min_y= module_.GetData()
+    map_height,map_width = module_.GetMaxSizes()
+    
     map_min_x = map_min_x*-1
     map_min_y = map_min_y*-1
     creator_state = 3
@@ -311,30 +315,15 @@ function love.update(dt)
 end
 
 function draw_player_pos()
-  love.graphics.setColor(0,0,255)
+  love.graphics.setColor(255,255,255)
+  love.graphics.scale(2,2)
  love.graphics.points(player.pos.x,player.pos.y)
  love.graphics.setColor(0xFF,0xFF,0xFF)
- 
- 
-  -- for i = 1, #tilesets[1]-1 do
- --   love.graphics.draw(tilesets[1].image, tilesets[1][i], 32*(i-1),0)
- -- end
- 
- 
 end
 
 function draw_player()
-  --love.graphics.setColor(0,0,255)
- -- love.graphics.rectangle("fill",screen_width/2,screen_height/2,5,5)
-  --love.graphics.points(screen_width/2, screen_height/2)
-  
-  
   love.graphics.setColor(0xFF,0xFF,0xFF)
-  --love.graphics.draw(tilesets[2].image,tilesets[2][1],player.pos.x,player.pos.y)
   love.graphics.draw(tilesets[2].image,tilesets[2][1],screen_width/2,screen_height/2)
-  
-  
-
 end
 
 function draw_menue()
@@ -424,7 +413,7 @@ function love.draw()
 
   DungeonCreator.Draw()
   
-  love.graphics.print(DungeonCreator.GetState(),0,20)
+  love.graphics.print(DungeonCreator.GetState(),screen_width/2-20,20)
   
   love.graphics.print(love.timer.getFPS(),100,0)
   
@@ -438,29 +427,18 @@ function love.draw()
    love.graphics.setBlendMode("alpha")
    love.graphics.setColor(255, 255, 255, 255)
     
+      love.graphics.scale(1,1)
   love.graphics.translate(-norm_x*32 +screen_width/2 +32,-norm_y*32+(screen_height/2)+32)
-  --print(norm_x,norm_x)
-  --love.graphics.scale( 0.2,0.2)
+
    love.graphics.draw(dungeon1,0,0)
   love.graphics.origin()
   
-  --draw the minimap
-  love.graphics.scale(0.5,0.5)
-  love.graphics.translate( map_min_x or 0, map_min_y or 0)
-  --love.graphics.setShader(shdr_minimap)
-    love.graphics.draw(map_canvas,0,0)
-   -- love.graphics.setShader()
-    draw_player_pos()
-  love.graphics.origin()
+
   
   --draw the real map
   scale_x = 1
   scale_y = 1
   
-   love.graphics.setShader(shdr_minimap)
-    love.graphics.draw(map_canvas,0,0)
-   love.graphics.setShader()
-   love.graphics.rectangle("fill",player.pos.x,player.pos.y,5,5);
   
   
   love.graphics.scale(1,1)
@@ -468,30 +446,24 @@ function love.draw()
    norm_x =( player.pos.x + map_min_x ) * scale_x
    norm_y =( player.pos.y + map_min_y ) * scale_y
    
-   
+   draw_player()
 
-   --print(norm_x.." "..norm_y)
-  -- print(player.pos.x.." "..player.pos.y .."----".. player.pos.x +map_min_x )
-  --love.graphics.translate((map_min_x+(screen_width/2))-norm_x,(map_min_y+(screen_height/2))-norm_y)
-  --love.graphics.translate((map_min_x+(screen_width/2))-norm_x,(map_min_y+(screen_height/2))-norm_y)
-    --love.graphics.draw(map_canvas,0,0)
-    
-  --love.graphics.origin()
-  draw_player()
-  
-  --imgui.Render()
-
-  
   love.graphics.origin()
   
  -- draw_menue()
   
+  love.graphics.setColor(0,0,0,255)
+  
+   love.graphics.rectangle("fill",0,0,map_width/2+5,map_height/2+5)
   love.graphics.setColor(255,255,255,255)
   
- -- for i = 1, #tilesets[1]-1 do
- --   love.graphics.draw(tilesets[1].image, tilesets[1][i], 32*(i-1),0)
- -- end
-  
+    love.graphics.scale(0.5,0.5)
+    love.graphics.translate( map_min_x or 0, map_min_y or 0)
+    love.graphics.setShader(shdr_minimap)
+      love.graphics.draw(map_canvas,0,0)
+    love.graphics.setShader()
+    draw_player_pos()
+  love.graphics.origin()  
  end
   
 

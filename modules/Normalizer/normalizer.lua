@@ -61,9 +61,9 @@ local tile_lookup = {
   [126] = 3,
   [127] = 13,
   [159] = 8,
-  [193] = 1,
+  [193] = 1,--ch,
   [199] = 6,
-  [207] = 1,
+  [207] = 6,--1,
   [223] = 9,
   [231] = 6,
   [241] = 5,
@@ -111,6 +111,9 @@ norm[2] = function ()
         checkable_points[#checkable_points].y = (room.y-min_y)+j
       end
     end
+        if (room.y-min_y)+room.height > max_rows then
+          max_rows = (room.y-min_y)+room.height
+        end
   end
   
   print(#lookup_table)
@@ -146,7 +149,7 @@ norm[3] = function ()
       --get other cells
       
       local point = checkable_points[i]
-         local sum = (map[point.y][point.x] == 0 and 0 or 2^0)+
+         local sum = (map[point.y-1][point.x] == 0 and 0 or 2^0)+
           (map[point.y-1][point.x+1] == 0 and 0 or 2^1)+
           (map[point.y][point.x+1] == 0 and 0 or 2^2)+
           (map[point.y+1][point.x+1]== 0 and 0 or 2^3)+
@@ -243,4 +246,9 @@ function normalizer.GetData()
   end
 end
 
+function normalizer.GetMaxSizes()
+  if is_finished == true then
+    return max_rows, max_cols
+  end
+end
 
