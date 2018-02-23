@@ -14,4 +14,5 @@ assert(not BASE:match('%.init%.$'), "Invalid require path `"..(...).."' (drop th
 return {
   
 	minimap = require(BASE .. 'minimap.minimap'),
+  effects = require(BASE .. 'effects.effects'),
 }
