@@ -4,12 +4,13 @@ require "modules.Normalizer"
 
 --shader library ...
 require "ressources.shaders"
-require "bit"
+local ui = require("modules.SimpleUI.SimpleUI")
+
 
 local resources = arg[1].."\\ressources\\"
 local shaders = "shaders\\"
 
-
+local lg = love.graphics
 -- settings for the to be created dungeon
 local newOptions = {
     --changeable settings
@@ -139,10 +140,11 @@ end
 
   
 function love.load()
+  --set the debugger and other cmd arguments
   for i ,argu in ipairs(arg) do
       print (argu)
       if argu == "-debug" then
-         require("mobdebug").start()   
+        require("mobdebug").start()   
       end
   end
   
@@ -150,13 +152,7 @@ function love.load()
   love.graphics.rectangle("line",0,0,40,10)
   love.graphics.present()
   
-  
-  
-
-  
-  --local args = arg
-  
-  
+  --dungeon options
   DungeonCreator.setOptions(newOptions)
   DungeonCreator.newDungeon()
   screen_width = love.graphics.getWidth()
@@ -171,28 +167,40 @@ function love.load()
   love.graphics.present()
 
   
-  
-  
   --load resources
   shdr_minimap = minimap.getShader()
   shdr_effects = effects.getGreyShader()
   shdr_blur    = effects.getBlurShader()
   
-  tilesets[#tilesets+1] = load_tileset("ressources/tilesets/BlueDungeonShaded.png",32,32)
+  tilesets[#tilesets+1] = load_tileset("ressources/tilesets/BlueDungeon.png",32,32)
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/CharsTiles.png",32,32)
 
+  -- load the ui
+  ui.init()
+  main_menue = {
+    ui.AddButton(options[1][1],screen_width/2 -45,100,90,40,0),
+    ui.AddButton(options[1][2],screen_width/2 -45,150,90,40,0),
+    ui.AddButton(options[1][3],screen_width/2 -45,200,90,40,0),
+    ui.AddButton(options[1][4],screen_width/2 -45,250,90,40,0),
+    
+  }
+  ui.AddSlider("test",screen_width/2 -200,300,400,60)
+  ui.AddClickHandle(button_cb)
 end
 
 
+function button_cb(id,name)
+  print("Button "..id.." was clicked...")
+end
 
 
 
 function dummy.Update(dt)
-  
+
 end
 
 function dummy.GetState()
- return " "  
+ return "waiting"  
 end
 
 function dummy.SetData()
@@ -297,7 +305,6 @@ finish[2]=function (module_)
     local stop = love.timer.getTime()
     print(stop-start)
     spawn_enemy()
-  
 end
 
 
@@ -330,7 +337,8 @@ function love.update(dt)
   update_creator(dt)
   
   check_keys(dt)
-
+  
+  ui.update()
 end
 
 function draw_player_pos()
@@ -500,6 +508,10 @@ function love.draw()
   love.graphics.print(love.timer.getFPS(),100,0)  
   love.graphics.print(norm_x.." "..norm_y,screen_width/2-55,20)
 --  love.graphics.rectangle("fill",,32,32)
+
+--lg.setBlendMode("subtract","premultiplied")
+ui.draw()
+--lg.setBlendMode("alpha","alphamultiply")
 end
 
 offs_x = 0
@@ -538,6 +550,9 @@ end
 
 function love.mousepressed(x,y,but,touch)
  -- imgui.MousePressed(x,y,but)
+ if map_image == 0 then
+   return
+  end
  print(normalizer.CheckSum(norm_x+offs_x,norm_y+offs_y))
 end
 
