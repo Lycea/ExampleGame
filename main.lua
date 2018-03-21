@@ -1,16 +1,19 @@
 require "modules.ProceduralDungeon"
 require "modules.Normalizer"
+local temp = require "modules.Debugster"
 --require "imgui" --maybe for tuning the values at some point (?)
-
+d = temp.debugster
 --shader library ...
 require "ressources.shaders"
-local ui = require("modules.SimpleUI.SimpleUI")
+ui = require("modules.SimpleUI.SimpleUI")
+--local profile = require("profile")
 
 
 local resources = arg[1].."\\ressources\\"
 local shaders = "shaders\\"
 
 local lg = love.graphics
+
 -- settings for the to be created dungeon
 local newOptions = {
     --changeable settings
@@ -127,10 +130,10 @@ end
   
   
 function spawn_enemy()
-  while #npcs<5 do
+  while #npcs<20 do
     local room =love.math.random(#rooms_n)
-    local x = math.random(rooms_n[room].x+1,rooms_n[room].x+rooms_n[room].width-1)
-    local y = math.random(rooms_n[room].y+1,rooms_n[room].y+rooms_n[room].height-1)
+    local x = math.random(rooms_n[room].x+2,rooms_n[room].x+rooms_n[room].width)
+    local y = math.random(rooms_n[room].y+2,rooms_n[room].y+rooms_n[room].height)
     npcs[#npcs+1]={x=x,y=y}
     print("Enemy "..#npcs.." spawned: "..x.." "..y)
   end
@@ -140,6 +143,7 @@ end
 
   
 function love.load()
+--os.execute("mkdir " .. "profile")
   --set the debugger and other cmd arguments
   for i ,argu in ipairs(arg) do
       print (argu)
@@ -147,6 +151,11 @@ function love.load()
         require("mobdebug").start()   
       end
   end
+  d.init()
+  
+  --d.profile.hookall("Lua")
+  --d.profile.start()
+  
   
   love.graphics.rectangle("fill",0,0,0,0)
   love.graphics.rectangle("line",0,0,40,10)
@@ -174,6 +183,7 @@ function love.load()
   
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/BlueDungeon.png",32,32)
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/CharsTiles.png",32,32)
+  tilesets[#tilesets+1] = load_tileset("ressources/tilesets/Enemies.png",32,32)
 
   -- load the ui
   ui.init()
@@ -183,8 +193,14 @@ function love.load()
     ui.AddButton(options[1][3],screen_width/2 -45,200,90,40,0),
     ui.AddButton(options[1][4],screen_width/2 -45,250,90,40,0),
     
+    ui.AddSlider("10",screen_width/2 -200,300,400,60,0,100),
+    ui.AddSlider("10",screen_width/2 -200,500,400,60,50,100)
   }
-  ui.AddSlider("test",screen_width/2 -200,300,400,60)
+
+  ui.AddGroup(main_menue,"menue")
+  ui.SetGroupVisible("menue",false)
+
+  
   ui.AddClickHandle(button_cb)
 end
 
@@ -331,14 +347,34 @@ function check_keys (dt)
 end
 
 
+
+deb_frame = 1
+report = nil
 function love.update(dt)
  -- imgui.NewFrame()
   
   update_creator(dt)
-  
   check_keys(dt)
   
   ui.update()
+  
+  deb_frame = deb_frame +1
+  if deb_frame %100 == 0 then
+    --report = profile.report("time",1000)
+    --profile.reset()
+    local n = 1
+    local fi =io.open(".\\profile\\"..os.time()..".csv","w")
+    fi:write('Position;Function name;Number of calls;Time;Source;Min_exec;Max_exec\n')
+    
+    for func, called, elapsed, source,min,max in d.profile.query("time", 1000) do
+      local t = {n, func, called,  string.gsub(tostring(elapsed),"%p",","), source,string.gsub(tostring(min),"%p",","),string.gsub(tostring(max),"%p",",") }
+      fi:write(table.concat(t, ";")..";".."\n")
+      --print(table.concat(t, ";")..";")
+      n = n + 1
+    end
+    fi:close()
+  end
+  
 end
 
 function draw_player_pos()
@@ -436,7 +472,7 @@ end
  norm_x = 0
  norm_y = 0
 
-
+sh_x = 0
 local function draw_map()
     love.graphics.scale(1,1)
    -- print(-norm_x*32 +screen_width/2 +32)
@@ -479,7 +515,7 @@ function love.draw()
   norm_y =( player.pos.y + map_min_y ) * scale_y
 
   --draw the state of the dungeon
-  DungeonCreator.Draw()
+  --DungeonCreator.Draw()
   
   --reset colors and stuff before drawing a canvas... else it will take that color as kind of a bitmask for the channels
    love.graphics.setBlendMode("alpha")
@@ -493,7 +529,8 @@ function love.draw()
       local pos_x = (npcs[i].x -player.pos.x)*32 + screen_width/2
       local pos_y = (npcs[i].y -player.pos.y)*32 + screen_height/2
      --, print(pos_x-screen_width/2 .." "..pos_y-screen_height/2)
-      love.graphics.rectangle("fill",pos_x,pos_y,32,32)
+      --love.graphics.rectangle("fill",pos_x,pos_y,32,32)
+        love.graphics.draw(tilesets[3].image,tilesets[3][16],pos_x,pos_y)
     end
     love.graphics.origin()
   
@@ -509,9 +546,15 @@ function love.draw()
   love.graphics.print(norm_x.." "..norm_y,screen_width/2-55,20)
 --  love.graphics.rectangle("fill",,32,32)
 
+
 --lg.setBlendMode("subtract","premultiplied")
+
 ui.draw()
 --lg.setBlendMode("alpha","alphamultiply")
+
+  if deb_frame %100 == 0 then
+   -- print(report or "wait")
+  end
 end
 
 offs_x = 0
@@ -531,6 +574,11 @@ function love.keypressed(key,code)
   if key =="d" then
      offs_x = offs_x +1
   end
+  if key == "1"then
+    --TODO: later trigger the menu on its own not in the debug menue ...
+     ui.SetGroupVisible("menue",d.show())
+  end
+  
   if key == "w" then
     offs_y = offs_y -1
   end
@@ -544,8 +592,6 @@ function love.keypressed(key,code)
    end
    
   end
-  
-  
 end
 
 function love.mousepressed(x,y,but,touch)
