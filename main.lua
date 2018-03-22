@@ -151,7 +151,13 @@ function love.load()
         require("mobdebug").start()   
       end
   end
+  ui.init()
+  ui.AddClickHandle(button_cb)
+  
   d.init()
+  
+  
+  
   
   --d.profile.hookall("Lua")
   --d.profile.start()
@@ -185,8 +191,8 @@ function love.load()
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/CharsTiles.png",32,32)
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/Enemies.png",32,32)
 
-  -- load the ui
-  ui.init()
+  -- create the ui
+  
   main_menue = {
     ui.AddButton(options[1][1],screen_width/2 -45,100,90,40,0),
     ui.AddButton(options[1][2],screen_width/2 -45,150,90,40,0),
@@ -201,7 +207,7 @@ function love.load()
   ui.SetGroupVisible("menue",false)
 
   
-  ui.AddClickHandle(button_cb)
+  
 end
 
 

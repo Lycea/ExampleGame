@@ -17,8 +17,15 @@ function debugster.init()
 ui.AddGroup(ids,"DebugView")
 ui.SetGroupVisible("DebugView",false)
 
+ui.SetSpecialCallback(ids[1],debug_callback)
 
 end
+
+function debug_callback (id,name)
+  
+end
+
+
 
 function debugster.draw()
 end
