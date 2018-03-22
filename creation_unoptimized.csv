@@ -1,0 +1,127 @@
+Position;Function name;Number of calls;Time;Source;avg
+5;main.lua:295;1;0,526;main.lua:295;0,526
+13;modules/Normalizer/normalizer.lua:204;1;0,062;modules/Normalizer/normalizer.lua:204;0,062
+16;modules/Normalizer/normalizer.lua:310;1;0,042;modules/Normalizer/normalizer.lua:310;0,042
+17;SetTiles;1;0,036;modules/Normalizer/normalizer.lua:372;0,036
+11;Update;3;0,104;modules/Normalizer/normalizer.lua:430;0,034666667
+20;modules/ProceduralDungeon/dungeon.lua:638;1;0,029;modules/ProceduralDungeon/dungeon.lua:638;0,029
+22;modules/ProceduralDungeon/dungeon.lua:452;1;0,026;modules/ProceduralDungeon/dungeon.lua:452;0,026
+24;triangulate;1;0,023;modules/ProceduralDungeon/src/delaunay.lua:362;0,023
+27;spawn_enemy;1;0,017;main.lua:130;0,017
+35;modules/ProceduralDungeon/dungeon.lua:475;1;0,008;modules/ProceduralDungeon/dungeon.lua:475;0,008
+40;main.lua:273;1;0,005;main.lua:273;0,005
+46;init;1;0,003;modules/SimpleUI/SimpleUI.lua:246;0,003
+47;mst;1;0,003;modules/ProceduralDungeon/dungeon.lua:202;0,003
+51;getShader;1;0,002;ressources/shaders/minimap/minimap.lua:40;0,002
+26;add_line;13;0,022;modules/Normalizer/normalizer.lua:145;0,001692308
+39;load_tileset;3;0,005;main.lua:87;0,001666667
+58;map;1;0,001;main.lua:413;0,001
+62;setOptions;1;0,001;modules/ProceduralDungeon/dungeon.lua:862;0,001
+1;draw;3798;2,04;main.lua:501;0,000537125
+37;main.lua:586;10;0,005;main.lua:586;0,0005
+65;modules/ProceduralDungeon/dungeon.lua:418;2;0,001;modules/ProceduralDungeon/dungeon.lua:418;0,0005
+12;Update;220;0,102;modules/ProceduralDungeon/dungeon.lua:903;0,000463636
+10;ClickEvent;358;0,139;main.lua:202;0,000388268
+2;draw;3798;1,304;modules/SimpleUI/SimpleUI.lua:45;0,000343339
+60;"[string ""wrap_Graphics.lua""]:257";3;0,001;"[string ""wrap_Graphics.lua""]:257";0,000333333
+3;update;3799;1,238;main.lua:347;0,000325875
+30;Triangle;45;0,01;modules/ProceduralDungeon/src/delaunay.lua:26;0,000222222
+31;__init;45;0,01;modules/ProceduralDungeon/src/delaunay.lua:205;0,000222222
+18;modules/ProceduralDungeon/dungeon.lua:360;162;0,033;modules/ProceduralDungeon/dungeon.lua:360;0,000203704
+4;update_creator;3799;0,746;main.lua:323;0,000196367
+57;union1;9;0,001;modules/ProceduralDungeon/dungeon.lua:123;0,000111111
+34;getCircumCircle;100;0,008;modules/ProceduralDungeon/src/delaunay.lua:270;0,00008
+64;Point;13;0,001;modules/ProceduralDungeon/src/delaunay.lua:26;7,69231E-05
+21;CheckCollision;346;0,026;modules/ProceduralDungeon/dungeon.lua:138;7,51445E-05
+7;draw_minimap;3798;0,252;main.lua:479;6,63507E-05
+36;getCircumRadius;100;0,006;modules/ProceduralDungeon/src/delaunay.lua:305;6E-05
+8;update;3799;0,157;modules/SimpleUI/SimpleUI.lua:167;4,13267E-05
+9;check_components;3799;0,155;modules/SimpleUI/SimpleUI.lua:104;4,08002E-05
+44;getSidesLength;100;0,004;modules/ProceduralDungeon/src/delaunay.lua:243;4E-05
+43;Edge;135;0,004;modules/ProceduralDungeon/src/delaunay.lua:26;2,96296E-05
+56;isFlatAngle;45;0,001;modules/ProceduralDungeon/src/delaunay.lua:49;2,22222E-05
+6;getPixel;21000;0,441;"[string ""ImageData.lua""]:143";0,000021
+59;modules/ProceduralDungeon/dungeon.lua:328;52;0,001;modules/ProceduralDungeon/dungeon.lua:328;1,92308E-05
+52;__init;135;0,002;modules/ProceduralDungeon/src/delaunay.lua:78;1,48148E-05
+14;draw_map;3798;0,056;main.lua:470;1,47446E-05
+15;draw_player;3798;0,055;main.lua:381;1,44813E-05
+45;same;208;0,003;modules/ProceduralDungeon/src/delaunay.lua:91;1,44231E-05
+25;checkIntersect;1992;0,022;modules/ProceduralDungeon/dungeon.lua:133;1,10442E-05
+63;inCircumCircle;100;0,001;modules/ProceduralDungeon/src/delaunay.lua:175;1E-05
+19;draw_player_pos;3798;0,03;main.lua:374;7,89889E-06
+61;check_contacts;161;0,001;modules/ProceduralDungeon/dungeon.lua:260;6,21118E-06
+33;lerp_point;1590;0,009;modules/Normalizer/normalizer.lua:118;5,66038E-06
+54;main.lua:257;222;0,001;main.lua:257;4,5045E-06
+28;check_keys;3799;0,012;main.lua:333;3,15873E-06
+29;GetState;4019;0,011;modules/ProceduralDungeon/dungeon.lua:932;2,737E-06
+55;__eq;402;0,001;modules/ProceduralDungeon/src/delaunay.lua:122;2,48756E-06
+48;add_to_check_and_lookup;1590;0,003;modules/Normalizer/normalizer.lua:134;1,88679E-06
+50;dist2;1068;0,002;modules/ProceduralDungeon/src/delaunay.lua:150;1,87266E-06
+32;modules/ProceduralDungeon/dungeon.lua:244;6344;0,01;modules/ProceduralDungeon/dungeon.lua:244;1,57629E-06
+38;lerp_;3180;0,005;modules/Normalizer/normalizer.lua:115;1,57233E-06
+42;__index;4258;0,005;modules/Normalizer/normalizer.lua:14;1,17426E-06
+41;checkDir;4440;0,005;modules/ProceduralDungeon/dungeon.lua:108;1,12613E-06
+23;inside;21000;0,023;"[string ""ImageData.lua""]:31";1,09524E-06
+66;main.lua:594;1133;0,001;main.lua:594;8,82613E-07
+49;Update;3574;0,002;main.lua:208;5,59597E-07
+53;GetState;3574;0,002;main.lua:212;5,59597E-07
+67;checkDir;4440;0;modules/ProceduralDungeon/dungeon.lua:130;0
+68;"[string ""boot.lua""]:134";1133;0;"[string ""boot.lua""]:134";0
+69;length;1068;0;modules/ProceduralDungeon/src/delaunay.lua:102;0
+70;length;1068;0;modules/ProceduralDungeon/src/delaunay.lua:162;0
+71;lerp_;955;0;modules/SimpleUI/SimpleUI.lua:34;0
+72;clamp;955;0;modules/SimpleUI/SimpleUI.lua:40;0
+73;check_pos;930;0;main.lua:223;0
+74;check_pos;930;0;modules/Normalizer/normalizer.lua:399;0
+75;main.lua:244;339;0;main.lua:244;0
+76;roundm;306;0;modules/ProceduralDungeon/dungeon.lua:83;0
+77;main.lua:263;189;0;main.lua:263;0
+78;main.lua:250;180;0;main.lua:250;0
+79;tostring;135;0;modules/ProceduralDungeon/src/delaunay.lua:123;0
+80;Edge;135;0;modules/ProceduralDungeon/src/delaunay.lua:25;0
+81;randomNormal;102;0;"[string ""wrap_Math.lua""]:36";0
+82;getCircumCenter;100;0;modules/ProceduralDungeon/src/delaunay.lua:284;0
+83;inCircumCircle;100;0;modules/ProceduralDungeon/src/delaunay.lua:330;0
+84;quatCross;100;0;modules/ProceduralDungeon/src/delaunay.lua:35;0
+85;root;90;0;modules/ProceduralDungeon/dungeon.lua:112;0
+86;getRandomPointInEllipse;51;0;modules/ProceduralDungeon/dungeon.lua:96;0
+87;"[string ""boot.lua""]:122";48;0;"[string ""boot.lua""]:122";0
+88;main.lua:557;48;0;main.lua:557;0
+89;"[string ""boot.lua""]:125";48;0;"[string ""boot.lua""]:125";0
+90;crossProduct;45;0;modules/ProceduralDungeon/src/delaunay.lua:42;0
+91;Triangle;45;0;modules/ProceduralDungeon/src/delaunay.lua:25;0
+92;random;24;0;"[string ""wrap_RandomGenerator.lua""]:33";0
+93;random;24;0;"[string ""wrap_Math.lua""]:32";0
+94;random;24;0;"[string ""wrap_RandomGenerator.lua""]:74";0
+95;floor_point;22;0;modules/Normalizer/normalizer.lua:128;0
+96;dist;13;0;modules/Normalizer/normalizer.lua:126;0
+97;Point;13;0;modules/ProceduralDungeon/src/delaunay.lua:25;0
+98;__init;13;0;modules/ProceduralDungeon/src/delaunay.lua:139;0
+99;main.lua:598;10;0;main.lua:598;0
+100;CheckSum;10;0;modules/Normalizer/normalizer.lua:409;0
+101;"[string ""boot.lua""]:137";10;0;"[string ""boot.lua""]:137";0
+102;"[string ""boot.lua""]:140";10;0;"[string ""boot.lua""]:140";0
+103;GetState;4;0;modules/Normalizer/normalizer.lua:422;0
+104;AddButton;4;0;modules/SimpleUI/SimpleUI.lua:207;0
+105;isPixelCode;3;0;"[string ""wrap_Graphics.lua""]:246";0
+106;createPixelCode;3;0;"[string ""wrap_Graphics.lua""]:227";0
+107;isVertexCode;3;0;"[string ""wrap_Graphics.lua""]:242";0
+108;AddSlider;2;0;modules/SimpleUI/SimpleUI.lua:172;0
+109;"[string ""boot.lua""]:185";2;0;"[string ""boot.lua""]:185";0
+110;modules/Normalizer/normalizer.lua:19;1;0;modules/Normalizer/normalizer.lua:19;0
+111;setRandomSeed;1;0;"[string ""wrap_Math.lua""]:40";0
+112;"[string ""boot.lua""]:182";1;0;"[string ""boot.lua""]:182";0
+113;SetData;1;0;modules/Normalizer/normalizer.lua:441;0
+114;GetData;1;0;modules/Normalizer/normalizer.lua:448;0
+115;newDungeon;1;0;modules/ProceduralDungeon/dungeon.lua:875;0
+116;SetTileset;1;0;modules/Normalizer/normalizer.lua:435;0
+117;modules/ProceduralDungeon/dungeon.lua:550;1;0;modules/ProceduralDungeon/dungeon.lua:550;0
+118;"[string ""boot.lua""]:188";1;0;"[string ""boot.lua""]:188";0
+119;getGreyShader;1;0;ressources/shaders/effects/effects.lua:46;0
+120;reset_dungeon;1;0;modules/ProceduralDungeon/dungeon.lua:857;0
+121;AddClickHandle;1;0;modules/SimpleUI/SimpleUI.lua:163;0
+122;"[string ""boot.lua""]:131";1;0;"[string ""boot.lua""]:131";0
+123;GetDungeon;1;0;modules/ProceduralDungeon/dungeon.lua:921;0
+124;getBlurShader;1;0;ressources/shaders/effects/effects.lua:51;0
+125;GetMaxSizes;1;0;modules/Normalizer/normalizer.lua:454;0
+126;__index;1;0;"[string ""ImageData.lua""]:97";0

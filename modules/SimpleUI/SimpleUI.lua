@@ -42,13 +42,9 @@ local function clamp(min, max, val)
 end
   
   
-function ui.draw()
-  if redraw then
-  lg.setCanvas(main_canvas)
-  lg.clear(0,0,0,0)
-    for i =1 ,#components.buttons do
-       local tmp = components.buttons[i]
-       if tmp.visible then
+  
+local function draw_button(tmp)
+    if tmp.visible then
         --draw the "background"
         love.graphics.setColor(settings.button[tmp.state.."_color"][1],settings.button[tmp.state.."_color"][2],settings.button[tmp.state.."_color"][3],settings.button[tmp.state.."_color"][4])
         love.graphics.rectangle("fill",tmp.x,tmp.y,tmp.width,tmp.height)
@@ -59,10 +55,11 @@ function ui.draw()
         love.graphics.setColor(settings.button["font_color"])
         love.graphics.print(tmp.txt,tmp.txt_pos.x,tmp.txt_pos.y)
       end
-    end
-    for i,v in pairs(components["slider"]) do
-      local tmp = components["slider"][i]
-       if tmp.visible then
+  end
+  
+  
+local function draw_slider(tmp)
+    if tmp.visible then
         --draw the label (value)
         love.graphics.setColor(settings.button["font_color"])
         love.graphics.print(tmp.value,tmp.txt_pos.x,tmp.txt_pos.y)
@@ -82,12 +79,28 @@ function ui.draw()
         love.graphics.setColor(settings.button["border_color"])
         love.graphics.rectangle("line",tmp.sli_pos.x,tmp.sli_pos.y,tmp.sli_pos.w,tmp.sli_pos.h)
       end
+  end
+  
+  
+function ui.draw()
+  if redraw then
+    lg.setCanvas(main_canvas)
+    lg.clear(0,0,0,0)
+    
+    for i =1 ,#components.buttons do
+       local tmp = components.buttons[i]
+       draw_button(tmp)
     end
     
-      
+    for i,v in pairs(components["slider"]) do
+       local tmp = components["slider"][i]
+       draw_slider(tmp)
+    end
+    
+    
     lg.setCanvas()
   end
-love.graphics.draw(main_canvas,0,0)
+  love.graphics.draw(main_canvas,0,0)
 end
 
 
@@ -105,59 +118,68 @@ function ui.SetGroupVisible(name,visible)
   
 end
 
-local function check_components()
-  local x,y = love.mouse.getX(),love.mouse.getY()
-  local clicked = love.mouse.isDown(1)
-  for k,name in pairs(lu_types) do
-    if name == "buttons" then
-       for i = 1,#components[name] do
-           local tmp_b = components[name][i]
-           local old =tmp_b.state 
-           if  (tmp_b.x < x) and (tmp_b.y< y) and (tmp_b.x+tmp_b.width > x) and tmp_b.y+tmp_b.height > y and tmp_b.visible then
-            --it is in rectangle so hover or click!!!
-              if focused == 0 or focused == tmp_b.id then
-                focused = tmp_b.id
-                components[name][i].state = clicked  and"clicked" or "hover"
-                t = clicked and components.ClickEvent(i,"test") or "nope"
-              end
-           else
-             if focused == tmp_b.id then focused = 0 end
-            components.buttons[i].state = "default" 
-           end
-           redraw = (old== components.buttons[i].state) and redraw or true 
-       end
-       
-    elseif name == "slider" then
-      for i,v in pairs(components[name]) do
-           local tmp_b = components[name][i] -- get the item
+local function check_buttons(clicked,x,y)
+  for i = 1,#components["buttons"] do
+   local tmp_b = components["buttons"][i]
+   local old =tmp_b.state 
+   if (tmp_b.x < x) and (tmp_b.y< y) and (tmp_b.x+tmp_b.width > x) and tmp_b.y+tmp_b.height > y and tmp_b.visible then
+      --it is in rectangle so hover or click!!!
+      if focused == 0 or focused == tmp_b.id then
+        focused = tmp_b.id
+        components["buttons"][i].state = clicked  and"clicked" or "hover"
+        t = clicked and components.ClickEvent(i,"test") or "nope"
+      end
+   else
+     if focused == tmp_b.id then focused = 0 end
+       components.buttons[i].state = "default" 
+     end
+     redraw = (old== components.buttons[i].state) and redraw or true 
+   end
+end
+
+
+local function check_slider(clicked,x,y)
+   for i,v in pairs(components["slider"]) do
+           local tmp_b = components["slider"][i] -- get the item
            local old =tmp_b.state 
            if  (tmp_b.sli_pos.x < x) and (tmp_b.sli_pos.y< y) and (tmp_b.sli_pos.x+tmp_b.sli_pos.w > x) and tmp_b.sli_pos.y+tmp_b.sli_pos.h > y and tmp_b.visible then
             --it is in rectangle so hover or click!!!
               
               if focused == 0 or focused == tmp_b.id then
                 focused = tmp_b.id
-                components[name][i].state = clicked and"clicked" or "hover"
-                components[name][i].sli_pos.x =  clamp(tmp_b.x +10,tmp_b.x+tmp_b.width-20,clicked and x-tmp_b.sli_pos.w/2 or tmp_b.sli_pos.x) 
+                components["slider"][i].state = clicked and"clicked" or "hover"
+                components["slider"][i].sli_pos.x =  clamp(tmp_b.x +10,tmp_b.x+tmp_b.width-20,clicked and x-tmp_b.sli_pos.w/2 or tmp_b.sli_pos.x) 
                 
                 local per =      ((tmp_b.x + 10) -tmp_b.sli_pos.x)/((tmp_b.x + 10) - (tmp_b.x+tmp_b.width-20))
-                components[name][i].value = lerp_(tmp_b.min,tmp_b.max,per)
+                components["slider"][i].value = lerp_(tmp_b.min,tmp_b.max,per)
               end
-           elseif  components[name][i].state == "clicked"  and clicked then
+           elseif  components["slider"][i].state == "clicked"  and clicked then
             -- it was dragged !! sooooo change x
             
-              components[name][i].sli_pos.x =  clamp(tmp_b.x + 10,tmp_b.x+tmp_b.width-20,x-tmp_b.sli_pos.w/2)
+              components["slider"][i].sli_pos.x =  clamp(tmp_b.x + 10,tmp_b.x+tmp_b.width-20,x-tmp_b.sli_pos.w/2)
               
               local per =      ((tmp_b.x + 10) -tmp_b.sli_pos.x)/((tmp_b.x + 10) - (tmp_b.x+tmp_b.width-20))
-              components[name][i].value = lerp_(tmp_b.min,tmp_b.max,per)
+              components["slider"][i].value = lerp_(tmp_b.min,tmp_b.max,per)
            
-         else
-            if focused == tmp_b.id then focused = 0 end
-            components[name][i].state = "default" 
-           end
+           else
+             if focused == tmp_b.id then focused = 0 end
+               components["slider"][i].state = "default" 
+             end
            --print(components[name][i].value)
-           components[name][i].value  = math.floor(components[name][i].value )
-           redraw = (old== components[name][i].state) and redraw or true 
-       end
+           components["slider"][i].value  = math.floor(components["slider"][i].value )
+           redraw = (old== components["slider"][i].state) and redraw or true 
+          end
+end
+
+
+local function check_components()
+  local x,y = love.mouse.getX(),love.mouse.getY()
+  local clicked = love.mouse.isDown(1)
+  for k,name in pairs(lu_types) do
+    if name == "buttons" then
+       check_buttons(clicked,x,y)
+    elseif name == "slider" then
+        check_slider(clicked,x,y)
     end
   end
   
