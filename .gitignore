@@ -1,3 +1,6 @@
 /seeds.txt
-
+/errors.txt
 *.csv
+*.pyxel
+*.xlsx
+profile/
