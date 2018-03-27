@@ -362,6 +362,7 @@ function love.update(dt)
   update_creator(dt)
   check_keys(dt)
   
+
   ui.update()
   
   deb_frame = deb_frame +1
@@ -371,16 +372,23 @@ function love.update(dt)
     local n = 1
     local fi =io.open(".\\profile\\"..os.time()..".csv","w")
     fi:write('Position;Function name;Number of calls;Time;Source;Min_exec;Max_exec\n')
-    
-    for func, called, elapsed, source,min,max in d.profile.query("time", 1000) do
-      local t = {n, func, called,  string.gsub(tostring(elapsed),"%p",","), source,string.gsub(tostring(min),"%p",","),string.gsub(tostring(max),"%p",",") }
-      fi:write(table.concat(t, ";")..";".."\n")
-      --print(table.concat(t, ";")..";")
-      n = n + 1
+    if fi == 0 then
+        
+    else
+        
+        for func, called, elapsed, source,min,max in d.profile.query("time", 1000) do
+          local t = {n, func, called,  string.gsub(tostring(elapsed),"%p",","), source,string.gsub(tostring(min),"%p",","),string.gsub(tostring(max),"%p",",") }
+          fi:write(table.concat(t, ";")..";".."\n")
+          --print(table.concat(t, ";")..";")
+          n = n + 1
+        end
+        fi:close()
     end
-    fi:close()
+    
   end
   
+
+  --ui.update()
 end
 
 function draw_player_pos()
@@ -553,9 +561,9 @@ function love.draw()
 --  love.graphics.rectangle("fill",,32,32)
 
 
---lg.setBlendMode("subtract","premultiplied")
 
 ui.draw()
+--ui.draw()1
 --lg.setBlendMode("alpha","alphamultiply")
 
   if deb_frame %100 == 0 then
@@ -589,6 +597,7 @@ function love.keypressed(key,code)
     offs_y = offs_y -1
   end
   if key == "q" then
+      love.quit()
     maj,min,pat,code = love.getVersion()
    if  maj == 0 and min >= 10 and pat >= 2 then
      print("reset supported")
