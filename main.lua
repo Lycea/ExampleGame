@@ -48,6 +48,7 @@ local map_min_y = 0
 local map_image = 0
 
 local actual_room = 0
+local goal_room   = 0
 
 local dungeon = DungeonCreator
 
@@ -86,6 +87,7 @@ local npcs = {}
   
 local dungeon1 = love.graphics.newCanvas(10,10)
   
+local function dist(p1,p2) return ((p2.x-p1.x)^2+(p2.y-p1.y)^2)^0.5 end
 --load a tileset/tileatlas
 function load_tileset(file,width,height)
   
@@ -291,6 +293,7 @@ finish[1]=function (module_)
     dungeon =   normalizer
     dungeon.SetData(edges_final,rooms_n,main_rooms)
     local start_pos = false
+    local start = nil
     
     while start_pos == false do
       
@@ -301,18 +304,39 @@ finish[1]=function (module_)
           actual_room = rooms[room].id
           print("actual_room = "..actual_room)
           start_pos = true
+          start = rooms[room]
         end
         
     end
     
+    local max_dist = {}
+    max_dist.id = 0
+    max_dist.dist = 0
+    for i=1,#rooms do 
+        if rooms[i].isMain then
+            print("room "..i)
+            local d=dist(rooms[i],start)
+            if d >max_dist.dist then
+                max_dist.id = rooms[i].id
+                max_dist.dist = d
+                print("new: "..max_dist.id.." distance: "..max_dist.dist)
+            end
+        end
+    end
+    goal_room = rooms[max_dist.id]
+    print("End room "..max_dist.id.." distance: "..max_dist.dist)
+    
 end
 canv = love.graphics.newCanvas(screen_width,screen_height)
 finish[2]=function (module_)
+    --get data about the map
     map_min_x, map_min_y= module_.GetData()
     map_height,map_width = module_.GetMaxSizes()
     
     map_min_x = map_min_x*-1
     map_min_y = map_min_y*-1
+    
+    --adjust creator state
     creator_state = 3
     
     
