@@ -5,8 +5,9 @@ print (i)
 BASE=BASE:sub(1,i-1)
 print(BASE)
 
-local b = require(BASE..'Button')
-local s = require(BASE..'Slider')
+local b   = require(BASE..'Button')
+local s   = require(BASE..'Slider')
+local cb  = require(BASE..'Checkbox')
 
 local ui = {}
 
@@ -167,6 +168,31 @@ function ui.AddButton(label,x,y,width,height,radius)
   return id
 end
 
+function ui.AddCheckbox(label,x,y,value)
+  local id = g_id
+  local temp = {}
+  
+  temp.id  = id
+  temp.txt = label or ""
+  temp.x   = x or 0
+  temp.y   = y or 0
+  
+  temp.state = "default"
+  temp.visible = true
+  temp.checked = value or false
+  
+  temp.color = settings.button
+  temp.ClickEvent = components.ClickEvent
+  
+  components[id] =cb:new(temp)
+  
+  redraw = true
+  
+  g_id =g_id +1
+  return id
+    
+end
+
 
 function ui.SetColor(component,color_type,color)
   settings[component][color_type] = color
@@ -190,5 +216,10 @@ function ui.SetSpecialCallback(id,fn)
   components[id].ClickEvent = fn
 end
 
+
+
+function ui.GetObject(id)
+    return components[id]
+end
 
 return ui

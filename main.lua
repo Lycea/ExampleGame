@@ -201,7 +201,9 @@ function love.load()
     ui.AddButton(options[1][4],screen_width/2 -45,250,90,40,0),
     
     ui.AddSlider("10",screen_width/2 -200,300,400,60,0,100),
-    ui.AddSlider("10",screen_width/2 -200,500,400,60,50,100)
+    ui.AddSlider("10",screen_width/2 -200,500,400,60,50,100),
+    
+    ui.AddCheckbox("test",screen_width/2 -200,600,false)
   }
 
   ui.AddGroup(main_menue,"menue")
