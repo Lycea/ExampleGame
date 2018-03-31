@@ -323,12 +323,12 @@ finish[2]=function (module_)
     
     map_image = map_canvas:newImageData()
     
-    local start = love.timer.getTime()
-    for i = 1 , 21000 do
-      map_image:getPixel(1,1)
-    end
-    local stop = love.timer.getTime()
-    print(stop-start)
+    --local start = love.timer.getTime()
+    --for i = 1 , 21000 do
+    --  map_image:getPixel(1,1)
+    --end
+    --local stop = love.timer.getTime()
+    --print(stop-start)
     spawn_enemy()
 end
 
