@@ -10,6 +10,7 @@ local min_y = 2000
 local data_in = {}
 
 local lookup_table = {}
+local lookup_rooms = {}
 
   --metatable used for checking tiles
   -- if index is not available it will simply return 0
@@ -21,6 +22,8 @@ local lookup_table = {}
     }
 
 norm[1] = function ()
+    
+    --TODO: Probably put them in one table already here ?
   --find min x and min y
   for i,room in ipairs(data_in.rooms) do
     if room.x < min_x then
@@ -129,6 +132,7 @@ end
 
 local function dist(p1,p2) return ((p2.x-p1.x)^2+(p2.y-p1.y)^2)^0.5 end
 
+-- removes floating points ... they are lot of reason for strange errors!!
 local function floor_point(p)
  p.x = math.floor(p.x)
  p.y = math.floor(p.y)
@@ -138,7 +142,12 @@ end
 local function add_to_check_and_lookup(x,y)
     if lookup_table[(y-min_y)] == nil then
         lookup_table[(y-min_y)] = {}
+        
+        lookup_rooms[(y-min_y)] = {}
+        
         setmetatable(lookup_table[y-min_y],meta_map)
+        setmetatable(lookup_rooms[y-min_y],{__index = function(t,key) return -1 end})
+        
         print("Missing lines")
         print(x.." "..y)
         print(x-min_x.." "..y-min_y)
@@ -150,6 +159,7 @@ local function add_to_check_and_lookup(x,y)
     checkable_points[#checkable_points].y = y -min_y
    
     lookup_table[(y-min_y)][(x-min_x)] = 1
+    lookup_rooms[(y-min_y)][(x-min_x)] = 0
   end
 end
 
@@ -216,13 +226,15 @@ end
 norm[2] = function ()
   local start = love.timer.getTime()
   
-  --first append both tables for only one loop with all rooms
+  --first append both tables for only one loop with all rooms!
   for i, room in  ipairs(data_in.main) do
       data_in.rooms[#data_in.rooms+1]=room
   end
   
   
   --adjust all data to min x and y and return table
+  -- that means just move them to the topmost and the left most
+  -- ( all indices minus the minimum and you get the position
   for i,room in ipairs(data_in.rooms) do
     for j = 1,room.height+1 do
       for k = 1,room.width+1 do
@@ -230,10 +242,19 @@ norm[2] = function ()
         if lookup_table[(room.y-min_y)+j] == nil then
             lookup_table[(room.y-min_y)+j] = {}
             setmetatable(lookup_table[(room.y-min_y)+j],meta_map)
+            
+            --add value for the edge ... this is needed because the checker will test it and will crash else!
             lookup_table[(room.y-min_y)+j][0] = 0
+            
+            --now for the room lookup
+            lookup_rooms[(room.y-min_y)+j] = {}
+            setmetatable(lookup_rooms[(room.y-min_y)+j],{__index = function(t,key) return -1 end})
+            lookup_table[(room.y-min_y)+j][0] = -1
         end
+        
         lookup_table[(room.y-min_y)+j][(room.x-min_x)+k] = 1
-        love.graphics.points((room.x-min_x)+k,(room.y-min_y)+j)
+        lookup_rooms[(room.y-min_y)+j][(room.x-min_x)+k] = room.id  --here set the id of the room to know which it is !
+        --love.graphics.points((room.x-min_x)+k,(room.y-min_y)+j)  -- debug for seing it afterwards ... TODO: remove if not needed or put to debug options ?
         if (room.x-min_x)+k > max_cols then
           max_cols = (room.x-min_x)+k
         end
@@ -249,6 +270,9 @@ norm[2] = function ()
   end
   
   -- start lerping the lines
+  --means it starts now to go  over all lines and add the lines to the lookup table 
+  -- max with at the moment is 3
+  -- TODO: Make the line width adjustable with a parameter and adjust them dynamically
   print("------------start lerping----------------")
   for i,edge in ipairs(data_in.edges) do
 
@@ -261,8 +285,12 @@ norm[2] = function ()
       add_line(edge.p1,edge.p3)
       add_line(edge.p2,edge.p3)
       
+      
       local x,y = 0,0
-      --check the 4 edges and place the missing one
+      
+      --check the 4 edges and place the missing one 
+      --when two lines are added with width 3 there is always the connecting
+      --edge missing
       if lookup_table[edge.p3.y-min_y -1][edge.p3.x-min_x-1] == 0 then
         lookup_table[edge.p3.y-min_y -1][edge.p3.x-min_x-1] = 1
         x,y = edge.p3.x-min_x-1,edge.p3.y-min_y -1
@@ -279,6 +307,8 @@ norm[2] = function ()
         lookup_table[edge.p3.y-min_y+1 ][edge.p3.x-min_x-1] = 1
         x,y= edge.p3.x-min_x-1,edge.p3.y-min_y +1
       end
+      
+        --this should not happen but just in case catch it..
         if x == 0 and y == 0 then
           
         else
@@ -298,19 +328,32 @@ norm[2] = function ()
   print("------------finished lerping----------------")
   
   --print(#lookup_table)
+  
+  --here are the first and the last line added also for 
+  -- the checker that it dosn't crash because it tries to check it :)
   lookup_table[0] ={}
   setmetatable(lookup_table[0],meta_map)
   
   lookup_table[#lookup_table+1] ={}
   setmetatable(lookup_table[#lookup_table],meta_map)
   
-  love.graphics.setColor(0,0xff,0,0xff)
+  
+  lookup_rooms[0] ={}
+  setmetatable(lookup_rooms[0],{__index= function (t,key)return -1 end})
+  
+  lookup_rooms[#lookup_rooms+1] ={}
+  setmetatable(lookup_rooms[#lookup_rooms],{__index= function (t,key)return -1 end})
+  
+  
+  -- love.graphics.setColor(0,0xff,0,0xff)
   
   
   local end_t = love.timer.getTime()
   print(end_t-start.." "..end_t.." "..start)
   
-  love.graphics.present()
+  --disabled the present because this and the one above is 
+  --slowing down... only needed for debug purposes
+  -- love.graphics.present()
   
   norm_step = norm_step +1
    
@@ -325,7 +368,10 @@ norm[3] = function ()
   lookup_tile = {}
   local map = lookup_table
   
-  
+  --go through all the points and calculate their binary sum!
+  -- this will say which tile needs to be placeed
+  -- it can also be adapted to support more neighbours if needed ... 
+  -- or can be used for biomes ...TODO: check back to the tutorial for that
   for i=1 , #checkable_points do
       --get other cells
       
@@ -342,15 +388,11 @@ norm[3] = function ()
           (map[point.y][point.x-1]==0 and 0 or 2^6)+
           (map[point.y-1][point.x-1]==0 and 0 or 2^7)
          love.graphics.setColor(255,0,0,255)
-         -- love.graphics.points(point.x+min_x,point.y+min_y)
-          if i > 26000 then
-           -- love.graphics.present()
-          end
+
+         -- fix if the number somehow is 0 ... which should not happen
          if sum == 0 then
-        --   love.graphics.points(point.x+min_x,point.y+min_y)
           sum = 17
-         print("zero")  
-         
+          print("zero")  
          end
          
          if tile_lookup[sum] == 17 and (sum ~= 255 and sum ~= 253) then
@@ -360,6 +402,7 @@ norm[3] = function ()
          
          lookup_table[point.y][point.x] =  tile_lookup[sum] -- has to be the number in the tile table
          
+         --for checking if every number is used...
          lookup_tile[sum] = true
   end
   table.sort(lookup_tile)
@@ -381,29 +424,22 @@ norm[4] = function ()
 end
 local tileset
 
+--this function sets all the tiles to a spirit batch for the dungeon
+--afterwards this can be used like an image!
 function normalizer.SetTiles()
-  --print(max_cols)
-  --print(#lookup_table)
-  
     local tilesetBatch = love.graphics.newSpriteBatch(tileset.image, #checkable_points)
     for i=1 , #checkable_points do
       --get other cells
       
       local point = checkable_points[i]
      -- print(lookup_table[point.y][point.x])
-      --success , temp_obj[#temp_obj].fixture =pcall( love.physics.newFixture,temp_obj[#temp_obj].body,temp_obj[#temp_obj].shape,1)
+
      local success = pcall(tilesetBatch.add,tilesetBatch,tileset[lookup_table[point.y][point.x]],(point.x-1)*32,(point.y-1)*32)
      if not success then
        print("error ".. point.x-1 .." "..point.y-1)
      end
-    
-      
-      --tilesetBatch:add(tileset[lookup_table[point.y][point.x]], (point.x-1)*32,(point.y-1)*32)
     end
-    
   
-  
-  --print(counts)
   tilesetBatch:flush()
   return tilesetBatch
 end
@@ -449,7 +485,8 @@ function normalizer.SetTileset(set)
 end
 
 
-
+--call this function before starting the normalizer
+--it needs these data to process them
 function normalizer.SetData(edges,rooms,main_rooms)
   data_in.edges = edges
   data_in.rooms = rooms
@@ -457,9 +494,13 @@ function normalizer.SetData(edges,rooms,main_rooms)
 end
 
 
+
+--after the normalizer is finished 
+--this function gives you the min and max value
+--also the lookup_table for when the it is resetting ..
 function normalizer.GetData()
   if is_finished == true then
-    return min_x,min_y,lookup_table
+    return min_x,min_y,lookup_table,lookup_rooms
   end
 end
 
