@@ -20,11 +20,11 @@ local newOptions = {
     --changeable settings
     max_width  = 20,              --max room width
     max_height = 10,              --max room height
-    mean_thresh = 1.4,           --mean_thresh - bigger than that will be main rooms
-    max_rooms = 50,              --max rooms , more means more rooms, more everything :P
+    mean_thresh = 0.1,           --mean_thresh - bigger than that will be main rooms
+    max_rooms = 10,              --max rooms , more means more rooms, more everything :P
     
     --seed options
-    useSeed   = true,            --do you want to create a special seed ?
+    useSeed   = false,            --do you want to create a special seed ?
     seed      = 1522581818, --123456789,--1512375225,--02,   some seeds!
     
     width_circle  =  300 ,  --these both say if a dungeon will be longer or higher 
@@ -624,10 +624,11 @@ function love.keypressed(key,code)
     offs_y = offs_y -1
   end
   if key == "q" then
-      love.event.quit()
+      --love.event.quit()
       maj,min,pat,code = love.getVersion()
       if  maj == 0 and min >= 10 and pat >= 2 then
        print("reset supported")
+       love.event.quit("restart")
       else
        print("reset not supported")
       end
