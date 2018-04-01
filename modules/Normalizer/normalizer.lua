@@ -10,11 +10,15 @@ local min_y = 2000
 local data_in = {}
 
 local lookup_table = {}
-      local meta_map = {
-        __index = function(t,key)
-          return 0
-        end
-        }
+
+  --metatable used for checking tiles
+  -- if index is not available it will simply return 0
+  -- means no problem in setting tiles
+  local meta_map = {
+    __index = function(t,key)
+      return 0
+    end
+    }
 
 norm[1] = function ()
   --find min x and min y
@@ -132,6 +136,14 @@ end
 
 
 local function add_to_check_and_lookup(x,y)
+    if lookup_table[(y-min_y)] == nil then
+        lookup_table[(y-min_y)] = {}
+        setmetatable(lookup_table[y-min_y],meta_map)
+        print("Missing lines")
+        print(x.." "..y)
+        print(x-min_x.." "..y-min_y)
+        print("\n\n")
+    end
   if lookup_table[(y-min_y)][(x-min_x)] ~= 1 then 
     checkable_points[#checkable_points+1] = {}
     checkable_points[#checkable_points].x = x -min_x

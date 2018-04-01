@@ -25,7 +25,7 @@ local newOptions = {
     
     --seed options
     useSeed   = true,            --do you want to create a special seed ?
-    seed      = 123456789,--1512375225,--02,                --which seed should that be :p
+    seed      = 1522581818 --123456789,--1512375225,--02,   some seeds!
     
     width_circle  =  300 ,  --these both say if a dungeon will be longer or higher 
     height_circle =  100,
