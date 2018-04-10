@@ -15,6 +15,7 @@ end
       o = o or {}   -- create object if user does not provide one
       o.name = "Slider"
       o.precision = 1
+      --Todo: please also set the right position here ...
       setmetatable(o, self)
       self.__index = self
       return o
