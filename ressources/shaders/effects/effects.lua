@@ -43,6 +43,24 @@ vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
 		return pixel;}
 ]]
 
+
+
+local string_4 = [[
+    extern float min;
+    extern float max;
+    vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
+    {
+        vec4 pixel = Texel(texture, texture_coords );//This is the current pixel color
+          float num =  10f/distance(vec2(love_ScreenSize.x/2+16,love_ScreenSize.y/2+16) ,vec2(pixel_coords.x,pixel_coords.y));
+          num = smoothstep(min,max,num);
+          pixel.r = pixel.r * num ;
+          pixel.g = pixel.g * num ;
+          pixel.b = pixel.b * num ;
+          
+          return pixel;
+    }
+]]
+
 function effects.getGreyShader()
     local shader = love.graphics.newShader(string_2)
     return shader
@@ -52,4 +70,10 @@ function effects.getBlurShader()
     local shader = love.graphics.newShader(string_3)
     return shader
 end
+
+function effects.getLightShader()
+    local shader = love.graphics.newShader(string_4)
+    return shader
+end
+
 return effects

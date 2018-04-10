@@ -24,7 +24,7 @@ local newOptions = {
     max_rooms = 10,              --max rooms , more means more rooms, more everything :P
     
     --seed options
-    useSeed   = false,            --do you want to create a special seed ?
+    useSeed   = true,            --do you want to create a special seed ?
     seed      = 1522581818, --123456789,--1512375225,--02,   some seeds!
     
     width_circle  =  300 ,  --these both say if a dungeon will be longer or higher 
@@ -189,6 +189,11 @@ function love.load()
   shdr_minimap = minimap.getShader()
   shdr_effects = effects.getGreyShader()
   shdr_blur    = effects.getBlurShader()
+  shdr_light   = effects.getLightShader()
+  
+  --send the default shader values
+  shdr_light:send("min",0)
+  shdr_light:send("max",1)
   
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/BlueDungeon.png",32,32)
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/CharsTiles.png",32,32)
@@ -197,20 +202,23 @@ function love.load()
   -- create the ui
   
   main_menue = {
-    ui.AddButton(options[1][1],screen_width/2 -45,100,90,40,0),
-    ui.AddButton(options[1][2],screen_width/2 -45,150,90,40,0),
-    ui.AddButton(options[1][3],screen_width/2 -45,200,90,40,0),
-    ui.AddButton(options[1][4],screen_width/2 -45,250,90,40,0),
+    --ui.AddButton(options[1][1],screen_width/2 -45,100,90,40,0),
+    --ui.AddButton(options[1][2],screen_width/2 -45,150,90,40,0),
+    --ui.AddButton(options[1][3],screen_width/2 -45,200,90,40,0),
+    --ui.AddButton(options[1][4],screen_width/2 -45,250,90,40,0),
     
-    ui.AddSlider("10",screen_width/2 -200,300,400,60,0,100),
-    ui.AddSlider("10",screen_width/2 -200,500,400,60,50,100),
+    --           det, pos x           ,pos y, w  ,h ,min,max
+    ui.AddSlider("0",0,300,200,30,0,1),
+    ui.AddSlider("0",0,500,200,30,0,1),
     
-    ui.AddCheckbox("test",screen_width/2 -200,600,false)
+    --ui.AddCheckbox("test",screen_width/2 -200,600,false)
   }
 
   ui.AddGroup(main_menue,"menue")
   ui.SetGroupVisible("menue",false)
-
+    
+  sli_min = ui.GetObject(main_menue[1])
+  sli_max = ui.GetObject(main_menue[2])
   
   
 end
@@ -330,7 +338,7 @@ end
 canv = love.graphics.newCanvas(screen_width,screen_height)
 finish[2]=function (module_)
     --get data about the map
-    map_min_x, map_min_y= module_.GetData()
+    map_min_x, map_min_y,look,room_look= module_.GetData()
     map_height,map_width = module_.GetMaxSizes()
     
     map_min_x = map_min_x*-1
@@ -433,28 +441,6 @@ function draw_player()
   
 end
 
-function draw_menue()
-   local m_x,m_y = love.mouse.getPosition()
-
-  love.graphics.setFont(love.graphics.newFont(35))
-  love.graphics.print("Title",screen_width/2 - screen_width/4,50)
-  
-  love.graphics.setFont(love.graphics.newFont(20))
-  love.graphics.rectangle("line",screen_width/2 - screen_width/4 - 10,20,screen_width/2,100)
-
-  
-  for i,k  in ipairs(options[1]) do
-    love.graphics.print(k,screen_width/2 - screen_width/4,100 + 50*i)
-  end
-  
-  love.graphics.rectangle("line",screen_width/2 - screen_width/4 -10, 145+select_*50,screen_width/4,35)
-  
-  love.graphics.setColor(0,255,255,150)
-  love.graphics.rectangle("fill",screen_width/2 - screen_width/4 -10, 145+select_*50,screen_width/4,35)
-  
-  love.graphics.setColor(255,0,0,255)
-  love.graphics.print(m_x.."/"..m_y,m_x,m_y -10)
-end
 
 
 function map()
@@ -514,6 +500,7 @@ end
  norm_y = 0
 
 sh_x = 0
+local old_room = 0
 local function draw_map()
     love.graphics.scale(1,1)
    -- print(-norm_x*32 +screen_width/2 +32)
@@ -535,16 +522,27 @@ local function draw_minimap()
     love.graphics.setShader(shdr_minimap)
       love.graphics.draw(map_canvas,0,0)
     love.graphics.setShader()
+    
+    --draw the actual room
+    --create a transparent canvas
+    --fill that with the actual rectangle of the room
+    -- change only if changed
+    
     draw_player_pos()
     love.graphics.setColor(255,0,0,255)
     
+    
     for i=1, #npcs do
-      love.graphics.rectangle("fill",npcs[i].x,npcs[i].y,10,10)
+      love.graphics.rectangle("fill",npcs[i].x,npcs[i].y,3,3)
     end
+    
+    
   love.graphics.origin()  
 end
 
+sli_max_old =1
 
+sli_min_old =0
 function love.draw()
   --initialise stuff
   scale_x = 1
@@ -562,9 +560,23 @@ function love.draw()
    love.graphics.setBlendMode("alpha")
    love.graphics.setColor(255, 255, 255, 255)
     
+    
+    if sli_max_old ~= sli_max.value then
+        shdr_light:send("max",sli_max.value)
+        sli_max_old = sli_max.value
+    end
+    
+    if sli_min_old ~= sli_min.value then
+        shdr_light:send("min",sli_min.value)
+        sli_min_old = sli_min.value
+    end
+    
+    
     --draw the real map
+    love.graphics.setShader(shdr_light)
    draw_map()
-   draw_player()
+   
+   
 
     for i = 1, #npcs do
       local pos_x = (npcs[i].x -player.pos.x)*32 + screen_width/2
@@ -573,9 +585,11 @@ function love.draw()
       --love.graphics.rectangle("fill",pos_x,pos_y,32,32)
         love.graphics.draw(tilesets[3].image,tilesets[3][16],pos_x,pos_y)
     end
+    
+    love.graphics.setShader()
     love.graphics.origin()
-  
- -- draw_menue()
+    
+    draw_player()
   
   draw_minimap()
  
@@ -585,17 +599,15 @@ function love.draw()
   love.graphics.print(DungeonCreator.GetState(),screen_width/2,20)
   love.graphics.print(love.timer.getFPS(),100,0)  
   love.graphics.print(norm_x.." "..norm_y,screen_width/2-55,20)
---  love.graphics.rectangle("fill",,32,32)
+  
+  if room_look then
+    love.graphics.print(room_look[norm_y][norm_x],screen_width/2+50,20)
+end
+
 
 
 
 ui.draw()
---ui.draw()1
---lg.setBlendMode("alpha","alphamultiply")
-
-  if deb_frame %100 == 0 then
-   -- print(report or "wait")
-  end
 end
 
 offs_x = 0
