@@ -105,8 +105,7 @@ function ui.AddSlider(value,x,y,width,height,min,max)
     temp.height = height or 30
     temp.txt_pos = {}
     
-    temp.txt_pos.x = x +50
-    temp.txt_pos.y = y + 7
+
     
     temp.state = "default"
     temp.visible = true
@@ -116,6 +115,10 @@ function ui.AddSlider(value,x,y,width,height,min,max)
     temp.sli_pos.y =temp.y+temp.height/2 -10
     temp.sli_pos.h = 20
     temp.sli_pos.w = 20
+    
+    
+    temp.txt_pos.x = temp.sli_pos.x *2 + 20
+    temp.txt_pos.y = temp.sli_pos.y + 7
     
     temp.value  = value or 0
     temp.min    = min   or 0
