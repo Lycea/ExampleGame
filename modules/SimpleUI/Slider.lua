@@ -14,12 +14,20 @@ end
  function Slider:new (o)
       o = o or {}   -- create object if user does not provide one
       o.name = "Slider"
+      o.precision = 1
       setmetatable(o, self)
       self.__index = self
       return o
 end
 
 
+function Slider.setPrecision(obj,precision)
+    if precision <1 then
+        precision =1
+    end
+    
+    obj.precision = precision
+end
 
 
 function Slider.draw(obj)
@@ -77,7 +85,8 @@ function Slider.update(obj,clicked,x,y,focused)
        obj.state = "default" 
      end
    --print(components[name][i].value)
-   obj.value  = math.floor(obj.value )
+        obj.value = math.floor(obj.value*math.pow(10,obj.precision))/math.pow(10,obj.precision)
+   --obj.value  = math.floor(obj.value )
    redraw = (old== obj.state) and redraw or true 
 
   return focused, redraw
