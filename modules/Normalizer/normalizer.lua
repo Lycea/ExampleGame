@@ -49,7 +49,7 @@ norm[1] = function ()
     
   end
   --print(min_x.."  "..min_y)
-  
+  min_x = min_x -1
   norm_step = norm_step +1
   --is_finished = true
 end
@@ -250,6 +250,8 @@ norm[2] = function ()
             lookup_rooms[(room.y-min_y)+j] = {}
             setmetatable(lookup_rooms[(room.y-min_y)+j],{__index = function(t,key) return -1 end})
             lookup_table[(room.y-min_y)+j][0] = -1
+            
+            
         end
         
         lookup_table[(room.y-min_y)+j][(room.x-min_x)+k] = 1
@@ -258,6 +260,8 @@ norm[2] = function ()
         if (room.x-min_x)+k > max_cols then
           max_cols = (room.x-min_x)+k
         end
+        
+        
         
         checkable_points[#checkable_points +1] = {}
         checkable_points[#checkable_points].x = (room.x-min_x)+k
