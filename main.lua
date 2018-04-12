@@ -406,11 +406,11 @@ function love.update(dt)
     --profile.reset()
     local n = 1
     local fi =io.open(".\\profile\\"..os.time()..".csv","w")
-    fi:write('Position;Function name;Number of calls;Time;Source;Min_exec;Max_exec\n')
-    if fi == 0 then
+    
+    if fi == nil then
         
     else
-        
+        fi:write('Position;Function name;Number of calls;Time;Source;Min_exec;Max_exec\n')
         for func, called, elapsed, source,min,max in d.profile.query("time", 1000) do
           local t = {n, func, called,  string.gsub(tostring(elapsed),"%p",","), source,string.gsub(tostring(min),"%p",","),string.gsub(tostring(max),"%p",",") }
           fi:write(table.concat(t, ";")..";".."\n")
