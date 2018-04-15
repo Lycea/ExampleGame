@@ -7,6 +7,8 @@ d = temp.debugster
 --shader library ...
 require "ressources.shaders"
 ui = require("modules.SimpleUI.SimpleUI")
+
+npcs_ = require("modules.npcs.enemies")
 --local profile = require("profile")
 
 
@@ -159,7 +161,7 @@ function love.load()
   
   d.init()
   
-  
+  npcs_.init()
   
   
   --d.profile.hookall("Lua")
