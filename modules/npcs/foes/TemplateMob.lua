@@ -1,15 +1,23 @@
 local tmp = {}
-
+--basic functions
 local function moveTo()
     
 end
 
-local function attack()
+
+local function attacking()
     
 end
 
-local function follow()
+local function following()
     
+end
+
+
+
+local function idle ()
+  
+  
 end
 
 local behaviors =
@@ -30,8 +38,8 @@ function tmp:new (o)
       o.state    = "sleep"  -- following,active,sleep,fighting,roaming,inactive
       o.effects  ={}  --table for fight effects ..
       
-      o.min_spawn
-      o.max_spawn
+      o.min_spawn = 0
+      o.max_spawn = 12
       
       o.pos  = o.pos or 0
       setmetatable(o, self)
