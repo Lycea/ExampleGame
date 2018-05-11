@@ -116,8 +116,8 @@ function ui.AddSlider(value,x,y,width,height,min,max)
     temp.sli_pos.h = 20
     temp.sli_pos.w = 20
     
-    
-    temp.txt_pos.x = temp.sli_pos.x *2 + 20
+    --love.graphics.rectangle(mode,obj.x+20,y,obj.width - 40,6)
+    temp.txt_pos.x = (temp.x + 20) + temp.width -40 +10
     temp.txt_pos.y = temp.sli_pos.y + 7
     
     temp.value  = value or 0

@@ -18,13 +18,18 @@ end
       --Todo: please also set the right position here ...
       setmetatable(o, self)
       self.__index = self
+      
+      local per = percent_(o.min,o.max,o.value)
+      print(per)
+      o.sli_pos.x = math.ceil( lerp_(o.x +10,o.x+o.width-20,per))
+      
       return o
 end
 
 
 function Slider.setPrecision(obj,precision)
-    if precision <1 then
-        precision =1
+    if precision <0 then
+        precision =0
     end
     
     obj.precision = precision
@@ -61,6 +66,9 @@ end
 function Slider.update(obj,clicked,x,y,focused)
   local redraw = false
   local old =obj.state 
+  
+  local min = obj.x +10
+  local max = obj.x+obj.width-20
    
    if  (obj.sli_pos.x < x) and (obj.sli_pos.y< y) and (obj.sli_pos.x+obj.sli_pos.w > x) and obj.sli_pos.y+obj.sli_pos.h > y and obj.visible then
     --it is in rectangle so hover or click!!!
@@ -68,17 +76,17 @@ function Slider.update(obj,clicked,x,y,focused)
       if focused == 0 or focused == obj.id then
         focused = obj.id
         obj.state = clicked and"clicked" or "hover"
-        obj.sli_pos.x =  clamp(obj.x +10,obj.x+obj.width-20,clicked and x-obj.sli_pos.w/2 or obj.sli_pos.x) 
+        obj.sli_pos.x =  clamp(min,max,clicked and x-obj.sli_pos.w/2 or obj.sli_pos.x) 
         
-        local per =      ((obj.x + 10) -obj.sli_pos.x)/((obj.x + 10) - (obj.x+obj.width-20))
+        local per =      ((min) -obj.sli_pos.x)/((min) - (max))
         obj.value = lerp_(obj.min,obj.max,per)
       end
    elseif  obj.state == "clicked"  and clicked then
     -- it was dragged !! sooooo change x
     
-      obj.sli_pos.x =  clamp(obj.x + 10,obj.x+obj.width-20,x-obj.sli_pos.w/2)
+      obj.sli_pos.x =  clamp(min,max,x-obj.sli_pos.w/2)
       
-      local per =      ((obj.x + 10) -obj.sli_pos.x)/((obj.x + 10) - (obj.x+obj.width-20))
+      local per =      ((min) -obj.sli_pos.x)/((min) - (max))
       obj.value = lerp_(obj.min,obj.max,per)
    
    else

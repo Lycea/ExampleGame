@@ -403,7 +403,7 @@ function love.update(dt)
   ui.update()
   
   deb_frame = deb_frame +1
-  if deb_frame %100 == 0 then
+  if deb_frame %100 == 0  and false then
     --report = profile.report("time",1000)
     --profile.reset()
     local n = 1
