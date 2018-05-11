@@ -1,15 +1,14 @@
+--load all neeeded libraries
 local er = require "modules.ErrorHandler.error"
 require "modules.ProceduralDungeon"
 require "modules.Normalizer"
 local temp = require "modules.Debugster"
---require "imgui" --maybe for tuning the values at some point (?)
 d = temp.debugster
+ui = require("modules.SimpleUI.SimpleUI")
+npcs_ = require("modules.npcs.enemies")
+
 --shader library ...
 require "ressources.shaders"
-ui = require("modules.SimpleUI.SimpleUI")
-
-npcs_ = require("modules.npcs.enemies")
---local profile = require("profile")
 
 
 local resources = arg[1].."\\ressources\\"
@@ -17,7 +16,8 @@ local shaders = "shaders\\"
 
 local lg = love.graphics
 
--- settings for the to be created dungeon
+--TODO: for later create a module with settings for different levels :P
+-- settings for the to be created dungeon ( first levels)
 local newOptions = {
     --changeable settings
     max_width  = 20,              --max room width
@@ -42,7 +42,7 @@ local build_new = true
 
 
 
-local edges_final ,rooms,rooms_n,main_rooms
+--local edges_final ,rooms,rooms_n,main_rooms
 local select_ = 0
 local sel_option = 0
 local map_min_x = 0
@@ -86,12 +86,22 @@ local dummy  = {}
 --all the loaded tilesets
 local tilesets ={}
 local npcs = {}
-  
+
+--dungeon map to draw ?
 local dungeon1 = love.graphics.newCanvas(10,10)
+
+
+
+local MAX_DUNGEONS = 2
+local actual_created_d = 1
+
+local active_dungeon = 0
+
+local dungeons = {}
   
 local function dist(p1,p2) return ((p2.x-p1.x)^2+(p2.y-p1.y)^2)^0.5 end
 --load a tileset/tileatlas
-function load_tileset(file,width,height)
+local function load_tileset(file,width,height)
   
     --not sure if line is needed could be done as temp
     --tilesets_img[count+1]= gr.newImage(file
@@ -134,11 +144,11 @@ end
   
   
   
-function spawn_enemy()
+local function spawn_enemy()
   while #npcs<20 do
-    local room =love.math.random(#rooms_n)
-    local x = math.random(rooms_n[room].x+2,rooms_n[room].x+rooms_n[room].width)
-    local y = math.random(rooms_n[room].y+2,rooms_n[room].y+rooms_n[room].height)
+    local room =love.math.random(#dungeons[active_dungeon].rooms_n)
+    local x = math.random(dungeons[active_dungeon].rooms_n[room].x+2,dungeons[active_dungeon].rooms_n[room].x+dungeons[active_dungeon].rooms_n[room].width)
+    local y = math.random(dungeons[active_dungeon].rooms_n[room].y+2,dungeons[active_dungeon].rooms_n[room].y+dungeons[active_dungeon].rooms_n[room].height)
     npcs[#npcs+1]={x=x,y=y}
     print("Enemy "..#npcs.." spawned: "..x.." "..y)
   end
@@ -151,7 +161,7 @@ function love.load()
 --os.execute("mkdir " .. "profile")
   --set the debugger and other cmd arguments
   for i ,argu in ipairs(arg) do
-      print (argu)
+      --print (argu)
       if argu == "-debug" then
         require("mobdebug").start()   
       end
@@ -197,6 +207,7 @@ function love.load()
   shdr_light:send("min",0)
   shdr_light:send("max",1)
   
+  --load the tilesets ...
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/BlueDungeon.png",32,32)
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/CharsTiles.png",32,32)
   tilesets[#tilesets+1] = load_tileset("ressources/tilesets/Enemies.png",32,32)
@@ -211,7 +222,7 @@ function love.load()
     
     --           det, pos x           ,pos y, w  ,h ,min,max
     ui.AddSlider("0",0,300,200,30,0,1),
-    ui.AddSlider("0",0,500,200,30,0,1),
+    ui.AddSlider("0.3",0,500,200,30,0,1),
     
     --ui.AddCheckbox("test",screen_width/2 -200,600,false)
   }
@@ -219,6 +230,7 @@ function love.load()
   ui.AddGroup(main_menue,"menue")
   ui.SetGroupVisible("menue",false)
     
+  --get the two sliders ...
   sli_min = ui.GetObject(main_menue[1])
   sli_max = ui.GetObject(main_menue[2])
   
@@ -226,7 +238,7 @@ function love.load()
 end
 
 
-function button_cb(id,name)
+local function button_cb(id,name)
   print("Button "..id.." was clicked...")
 end
 
@@ -247,13 +259,10 @@ end
 local debug = true
 
 
-local function check_pos (x,y)
+local function check_pos (x,y,look_)
   --print(x.." "..y)
-   if map_image == 0 then
-    return false
-  end
 
-  return normalizer.CheckPoint(x,y)
+  return normalizer.CheckPoint(x,y,look_)
   
  
   
@@ -269,26 +278,29 @@ local function check_pos (x,y)
 end
 
 function move.left ()
-  if check_pos(norm_x-1,norm_y) == true then
+  if dungeons[active_dungeon]  == nil then return end
+  if check_pos(norm_x-1,norm_y,dungeons[active_dungeon].lookup) == true then
     player.pos.x = player.pos.x -1
   end
 end
 
 function move.right ()
-  
-  if check_pos(norm_x+1,norm_y)== true  then
+  if dungeons[active_dungeon]  == nil then return end
+  if check_pos(norm_x+1,norm_y,dungeons[active_dungeon].lookup)== true  then
     player.pos.x = player.pos.x +1
   end
 end
 
 function move.up ()
-  if check_pos(norm_x,norm_y-1) then
+  if dungeons[active_dungeon]  == nil then return end
+  if check_pos(norm_x,norm_y-1,dungeons[active_dungeon].lookup) then
     player.pos.y = player.pos.y -1  
   end
 end
 
 function move.down()
-  if check_pos(norm_x,norm_y +1) then
+    if dungeons[active_dungeon]  == nil then return end
+  if check_pos(norm_x,norm_y +1,dungeons[active_dungeon].lookup) then
     player.pos.y = player.pos.y +1
   end
 end
@@ -298,30 +310,43 @@ end
 
 -- returns the finished dungeon and sets state to normalizer or whatever is needed next
 finish[1]=function (module_)
-    edges_final,rooms,rooms_n,main_rooms= module_.GetDungeon()
+    dungeons[actual_created_d] = {}
+    
+    local edges_final,rooms,rooms_n,main_rooms = module_.GetDungeon()
     creator_state = 2
     dungeon =   normalizer
+    dungeon.reset()
+    
     dungeon.SetData(edges_final,rooms_n,main_rooms)
     local start_pos = false
     local start = nil
+    local start_room =0
+    local pos = {}
+    
     
     while start_pos == false do
       
        local room =love.math.random(#rooms)
         if rooms[room].isMain then
-          player.pos.x = rooms[room].CenterX
-          player.pos.y = rooms[room].CenterY
-          actual_room = rooms[room].id
+          pos.x = rooms[room].CenterX
+          pos.y = rooms[room].CenterY
+          start_room  = rooms[room].id
           print("actual_room = "..actual_room)
           start_pos = true
           start = rooms[room]
         end
         
     end
+    local goal_ = {}
+    local goal_pos = {}
     
     local max_dist = {}
     max_dist.id = 0
     max_dist.dist = 0
+    
+    
+    --TODO: Is that the best possibility or should it be another way to set the goal ?
+    --get the main room that is the farthest away and set it as the end room of the level
     for i=1,#rooms do 
         if rooms[i].isMain then
             print("room "..i)
@@ -333,37 +358,83 @@ finish[1]=function (module_)
             end
         end
     end
-    goal_room = rooms[max_dist.id]
+    
+    goal_ = rooms[max_dist.id]
+    
+    goal_pos.x = love.math.random(goal_.x+1,goal_.width-1)
+    goal_pos.y = love.math.random(goal_.y+1,goal_.height-1)
+    
+    
+    
     print("End room "..max_dist.id.." distance: "..max_dist.dist)
     
+    dungeons[actual_created_d].edges_final = edges_final
+    dungeons[actual_created_d].rooms       = rooms
+    dungeons[actual_created_d].rooms_n     = rooms_n
+    dungeons[actual_created_d].main_rooms  = main_rooms
+    
+    dungeons[actual_created_d].start    = pos
+    dungeons[actual_created_d].start.id = start_room
+    
+    dungeons[actual_created_d].goal    = goal_pos
+    dungeons[actual_created_d].goal.id = goal_.id
 end
+
+
 canv = love.graphics.newCanvas(screen_width,screen_height)
 finish[2]=function (module_)
     --get data about the map
-    map_min_x, map_min_y,look,room_look= module_.GetData()
-    map_height,map_width = module_.GetMaxSizes()
+    local map_min_x, map_min_y,lookup,room_look= module_.GetData()
+    local map_height,map_width = module_.GetMaxSizes()
+    
     
     map_min_x = map_min_x*-1
     map_min_y = map_min_y*-1
     
-    --adjust creator state
-    creator_state = 3
     
+    dungeons[actual_created_d].map_min_x    = map_min_x
+    dungeons[actual_created_d].map_min_y    = map_min_y
+    dungeons[actual_created_d].lookup       = lookup
+    dungeons[actual_created_d].room_lookup  = room_lookup
     
+    dungeons[actual_created_d].map_height = map_height
+    dungeons[actual_created_d].map_width  = map_width
+   
+    
+    --set the wanted dungeon tileset... and create the map
     module_.SetTileset(tilesets[1])
-    dungeon1= module_.SetTiles()
-    dungeon = dummy
-    map()
+    dungeons[actual_created_d].map= module_.SetTiles()
     
-    map_image = map_canvas:newImageData()
+    dungeon.reset()
+    --check if the buffer is big enough right now
+    if #dungeons == MAX_DUNGEONS then
+        dungeon = dummy
+        
+        --adjust creator state
+        creator_state = 3
+    else
+        creator_state = 1
+        newOptions.seed = newOptions.seed +1
+        DungeonCreator.setOptions(newOptions)
+        DungeonCreator.newDungeon()
+        
+        
+        dungeon = DungeonCreator
+    end
     
-    --local start = love.timer.getTime()
-    --for i = 1 , 21000 do
-    --  map_image:getPixel(1,1)
-    --end
-    --local stop = love.timer.getTime()
-    --print(stop-start)
+    dungeons[actual_created_d].minimap_canv =map()
+    dungeons[actual_created_d].minimap_img = dungeons[actual_created_d].minimap_canv:newImageData()
+    
+    if active_dungeon == 0 then
+        active_dungeon = 1
+        player.pos.x =dungeons[actual_created_d].start.x
+        player.pos.y =dungeons[actual_created_d].start.y
+    end
+    
+    --TODO: spawning should be handled in the update 
     spawn_enemy()
+    
+    actual_created_d = actual_created_d+1
 end
 
 
@@ -394,7 +465,6 @@ end
 deb_frame = 1
 report = nil
 function love.update(dt)
- -- imgui.NewFrame()
   
   update_creator(dt)
   check_keys(dt)
@@ -403,6 +473,8 @@ function love.update(dt)
   ui.update()
   
   deb_frame = deb_frame +1
+  
+  --write out profiler data all 100 frames
   if deb_frame %100 == 0  and false then
     --report = profile.report("time",1000)
     --profile.reset()
@@ -423,9 +495,6 @@ function love.update(dt)
     end
     
   end
-  
-
-  --ui.update()
 end
 
 function draw_player_pos()
@@ -445,8 +514,10 @@ end
 
 
 
+--generate the minimap canvas once
 function map()
-  love.graphics.setCanvas(map_canvas)
+  local temp_map = love.graphics.newCanvas(screen_width,screen_height)
+  love.graphics.setCanvas(temp_map)
   love.graphics.clear()
   love.graphics.setBlendMode("alpha")
  -- love.graphics.translate(map_min_x*-1,map_min_y*-1)
@@ -454,7 +525,7 @@ function map()
   love.graphics.setColor(0,255,0,255)
   love.graphics.setLineWidth(3)
   
-    for i,edge in ipairs(edges_final) do
+    for i,edge in ipairs(dungeons[actual_created_d].edges_final) do
       if edge.isL == true then
         love.graphics.line(edge.p1.x,edge.p1.y,edge.p3.x,edge.p3.y,edge.p2.x,edge.p2.y)
       else
@@ -465,14 +536,14 @@ function map()
 
   
   love.graphics.setLineWidth(1)
-  for i in ipairs(rooms) do
-     if rooms[i].isMain == true then
+  for i in ipairs(dungeons[actual_created_d].rooms) do
+     if dungeons[actual_created_d].rooms[i].isMain == true then
        love.graphics.setColor(255,255,255,255)
        
        
        love.graphics.setColor(255,0,0,200)
        
-       love.graphics.rectangle("fill",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
+       love.graphics.rectangle("fill",dungeons[actual_created_d].rooms[i].x,dungeons[actual_created_d].rooms[i].y,dungeons[actual_created_d].rooms[i].width,dungeons[actual_created_d].rooms[i].height)
     
        love.graphics.setColor(255,0,0,255)
        --love.graphics.rectangle("line",rooms[i].x,rooms[i].y,rooms[i].width,rooms[i].height)
@@ -486,17 +557,18 @@ function map()
     end
    end
   
-   for i in ipairs(rooms_n) do    
+   for i in ipairs(dungeons[actual_created_d].rooms_n) do    
          love.graphics.setColor(0,200,200,200)
          
-         love.graphics.rectangle("fill",rooms_n[i].x,rooms_n[i].y,rooms_n[i].width,rooms_n[i].height)
+         love.graphics.rectangle("fill",dungeons[actual_created_d].rooms_n[i].x,dungeons[actual_created_d].rooms_n[i].y,dungeons[actual_created_d].rooms_n[i].width,dungeons[actual_created_d].rooms_n[i].height)
       
          love.graphics.setColor(0,200,200,255)
-         love.graphics.rectangle("line",rooms_n[i].x,rooms_n[i].y,rooms_n[i].width,rooms_n[i].height)
+         love.graphics.rectangle("line",dungeons[actual_created_d].rooms_n[i].x,dungeons[actual_created_d].rooms_n[i].y,dungeons[actual_created_d].rooms_n[i].width,dungeons[actual_created_d].rooms_n[i].height)
    end
    
 --   love.graphics.origin()
    love.graphics.setCanvas()
+   return temp_map
 end
  norm_x = 0
  norm_y = 0
@@ -507,7 +579,7 @@ local function draw_map()
     love.graphics.scale(1,1)
    -- print(-norm_x*32 +screen_width/2 +32)
     love.graphics.translate(-norm_x*32 +screen_width/2 +32,-norm_y*32+(screen_height/2)+32)
-      love.graphics.draw(dungeon1,0,0)
+      love.graphics.draw(dungeons[active_dungeon].map,0,0)
     love.graphics.origin()
 end
 
@@ -515,14 +587,14 @@ end
 local function draw_minimap()
    --draw the minimap "background"
   love.graphics.setColor(0,0,0,255)
-    love.graphics.rectangle("fill",0,0,map_width/2+5,map_height/2+5) 
+    love.graphics.rectangle("fill",0,0,dungeons[active_dungeon].map_width/2+5,dungeons[active_dungeon].map_height/2+5) 
   love.graphics.setColor(255,255,255,255)
   
   --draw the minimap (scaled from the big map and added a shader)
   love.graphics.scale(0.5,0.5)
-  love.graphics.translate( map_min_x or 0, map_min_y or 0)
+  love.graphics.translate( dungeons[active_dungeon].map_min_x or 0, dungeons[active_dungeon].map_min_y or 0)
     love.graphics.setShader(shdr_minimap)
-      love.graphics.draw(map_canvas,0,0)
+      love.graphics.draw(dungeons[active_dungeon].minimap_canv,0,0)
     love.graphics.setShader()
     
     --draw the actual room
@@ -552,8 +624,10 @@ function love.draw()
   
   --normalized values for all!!!
   -- map to player
-  norm_x =( player.pos.x + map_min_x ) * scale_x
-  norm_y =( player.pos.y + map_min_y ) * scale_y
+  if active_dungeon ~= 0 then
+  norm_x =( player.pos.x + dungeons[active_dungeon].map_min_x ) * scale_x
+  norm_y =( player.pos.y + dungeons[active_dungeon].map_min_y ) * scale_y
+  end
 
   --draw the state of the dungeon
   --DungeonCreator.Draw()
@@ -576,7 +650,10 @@ function love.draw()
     
     --draw the real map
     love.graphics.setShader(shdr_light)
-   draw_map()
+    if active_dungeon ~= 0 then
+        draw_map()
+    end
+    
    
    
 
@@ -592,8 +669,9 @@ function love.draw()
     love.graphics.origin()
     
     draw_player()
-  
+  if active_dungeon ~= 0 then
   draw_minimap()
+  end
  
  love.graphics.setColor(0, 0, 0, 255)
   love.graphics.rectangle("fill",screen_width/2-55,17,400,20)
@@ -618,7 +696,6 @@ offs_y = 0
 function love.keypressed(key,code)
   if key == "left" or key == "right" or key == "up" or key == "down" then
     last_key = key
-  --  imgui.KeyPressed(key,code)
   end
   if key == "a" then
     offs_x = offs_x -1
@@ -638,7 +715,6 @@ function love.keypressed(key,code)
     offs_y = offs_y -1
   end
   if key == "q" then
-      --love.event.quit()
       maj,min,pat,code = love.getVersion()
       if  maj == 0 and min >= 10 and pat >= 2 then
        print("reset supported")
@@ -650,7 +726,7 @@ function love.keypressed(key,code)
 end
 
 function love.mousepressed(x,y,but,touch)
- -- imgui.MousePressed(x,y,but)
+ 
  if map_image == 0 then
    return
   end
@@ -658,11 +734,11 @@ function love.mousepressed(x,y,but,touch)
 end
 
 function love.mousemoved(x,y,dx,dy,tou)
- -- imgui.MouseMoved(x,y,dx,dy)
+ 
 end
 
 function love.mousereleased(x,y,but)
-  --  imgui.MouseReleased(x,y,but)
+ 
 end
 
 

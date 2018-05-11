@@ -431,7 +431,7 @@ local tileset
 --this function sets all the tiles to a spirit batch for the dungeon
 --afterwards this can be used like an image!
 function normalizer.SetTiles()
-    local tilesetBatch = love.graphics.newSpriteBatch(tileset.image, #checkable_points)
+    local tilesetBatch = love.graphics.newSpriteBatch(tileset.image, #checkable_points,"static")
     for i=1 , #checkable_points do
       --get other cells
       
@@ -440,7 +440,8 @@ function normalizer.SetTiles()
 
      local success = pcall(tilesetBatch.add,tilesetBatch,tileset[lookup_table[point.y][point.x]],(point.x-1)*32,(point.y-1)*32)
      if not success then
-       print("error ".. point.x-1 .." "..point.y-1)
+         --TODO: check the summ and put it out !
+       print("error ".. point.x-1 .." "..point.y-1 .." got a strange sum posibly!!")
      end
     end
   
@@ -448,18 +449,31 @@ function normalizer.SetTiles()
   return tilesetBatch
 end
 
-function normalizer.CheckPoint(x,y)
+function normalizer.CheckPoint(x,y,table_)
   
   --print(lookup_table[y][x])
   
-  if lookup_table[y][x] == 17  then
-    return true
+  if table_ == nil then
+      
+      if lookup_table[y][x] == 17  then
+        return true
+      end
+      return false
+  else
+      if table_[y][x] == 17 then
+          return true
+      end
+      return false
   end
-  return false
 end
 
-function normalizer.CheckSum(x,y)
-           local sum = (lookup_table[y-1][x] == 0 and 0 or 2^0)+
+--check the summ of a specific tile 
+--needed for debug purpose or maybe 
+--later if you can destroy a wall :)
+function normalizer.CheckSum(x,y,table_)
+    if table_ == nil then
+          --use the default table stored in the module
+          local sum = (lookup_table[y-1][x] == 0 and 0 or 2^0)+
           (lookup_table[y-1][x+1] == 0 and 0 or 2^1)+
           (lookup_table[y][x+1] == 0 and 0 or 2^2)+
           (lookup_table[y+1][x+1]== 0 and 0 or 2^3)+
@@ -468,6 +482,18 @@ function normalizer.CheckSum(x,y)
           (lookup_table[y][x-1]==0 and 0 or 2^6)+
           (lookup_table[y-1][x-1]==0 and 0 or 2^7)
           return sum
+      else
+          --use a given table from outside ... ( for example if at the moment a different dungeon is in creation)
+          local sum = (table_[y-1][x] == 0 and 0 or 2^0)+
+          (table_[y-1][x+1] == 0 and 0 or 2^1)+
+          (table_[y][x+1] == 0 and 0 or 2^2)+
+          (table_[y+1][x+1]== 0 and 0 or 2^3)+
+          (table_[y+1][x]== 0 and 0 or 2^4)+
+          (table_[y+1][x-1]==0 and 0 or 2^5)+
+          (table_[y][x-1]==0 and 0 or 2^6)+
+          (table_[y-1][x-1]==0 and 0 or 2^7)
+      end
+      
 end
 
 
@@ -513,4 +539,21 @@ function normalizer.GetMaxSizes()
     return max_rows, max_cols
   end
 end
+
+function normalizer.reset()
+    max_cols = 0
+    max_rows = 0
+    min_x = 20000
+    min_y = 20000
+    
+    checkable_points = {}
+    lookup_table     = {}
+    lookup_rooms     = {}
+    is_finished      = false
+    norm_step        = 1
+    
+    data_in = {}
+    tileset = nil
+end
+
 
