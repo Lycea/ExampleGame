@@ -5,6 +5,8 @@ require "modules.Normalizer"
 local temp = require "modules.Debugster"
 d = temp.debugster
 ui = require("modules.SimpleUI.SimpleUI")
+
+
 npcs_ = require("modules.npcs.enemies")
 
 --shader library ...
@@ -45,9 +47,6 @@ local build_new = true
 --local edges_final ,rooms,rooms_n,main_rooms
 local select_ = 0
 local sel_option = 0
-local map_min_x = 0
-local map_min_y = 0
-local map_image = 0
 
 local actual_room = 0
 local goal_room   = 0
@@ -75,8 +74,6 @@ local timer_move = 0
 local creator_state = 1
   
 --width and height from the map, later set  
-local map_width  = 0
-local map_height = 0
 
 --function tables
 local move   = {}
@@ -87,8 +84,6 @@ local dummy  = {}
 local tilesets ={}
 local npcs = {}
 
---dungeon map to draw ?
-local dungeon1 = love.graphics.newCanvas(10,10)
 
 
 
@@ -178,6 +173,7 @@ function love.load()
   --d.profile.start()
   
   
+  --loading bar
   love.graphics.rectangle("fill",0,0,0,0)
   love.graphics.rectangle("line",0,0,40,10)
   love.graphics.present()
@@ -770,10 +766,10 @@ end
 
 function love.mousepressed(x,y,but,touch)
  
- if map_image == 0 then
+ if active_dungeon == 0 then
    return
   end
- print(normalizer.CheckSum(norm_x+offs_x,norm_y+offs_y))
+ print(normalizer.CheckSum( norm_x+offs_x,norm_y+offs_y,dungeons[active_dungeon].lookup))
 end
 
 function love.mousemoved(x,y,dx,dy,tou)

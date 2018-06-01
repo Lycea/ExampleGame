@@ -492,6 +492,7 @@ function normalizer.CheckSum(x,y,table_)
           (table_[y+1][x-1]==0 and 0 or 2^5)+
           (table_[y][x-1]==0 and 0 or 2^6)+
           (table_[y-1][x-1]==0 and 0 or 2^7)
+          return sum
       end
       
 end
