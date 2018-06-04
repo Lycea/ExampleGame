@@ -346,8 +346,8 @@ finish[1]=function (module_)
     goal_ = rooms[max_dist.id]
   
     
-    goal_pos.x = love.math.random(goal_.x+1,goal_.x +goal_.width-1)
-    goal_pos.y = love.math.random(goal_.y+1,goal_.y +goal_.height-1)
+    goal_pos.x = love.math.random(goal_.x+2,goal_.x +goal_.width-2)
+    goal_pos.y = love.math.random(goal_.y+2,goal_.y +goal_.height-2)
     
     
     
@@ -766,6 +766,7 @@ end
 
 function love.mousepressed(x,y,but,touch)
  
+ -- debug output the calculated summ of the tile
  if active_dungeon == 0 then
    return
   end
