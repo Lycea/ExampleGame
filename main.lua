@@ -31,7 +31,7 @@ local newOptions = {
     useSeed   = false,            --do you want to create a special seed ?
     seed      = 1522581818, --123456789,--1512375225,--02,   some seeds!
     
-    width_circle  =  300 ,  --these both say if a dungeon will be longer or higher 
+    width_circle  =  100 ,  --these both say if a dungeon will be longer or higher 
     height_circle =  100,
     
     percent_paths_added_back = 0,   --percentage of lines addedd back to the optimal way
@@ -529,7 +529,7 @@ end
 
 function draw_player()
   love.graphics.setColor(0xFF,0,0,170)
-  love.graphics.rectangle("fill",screen_width/2 + offs_x*32,screen_height/2+offs_y*32,32,32)
+  --love.graphics.rectangle("fill",screen_width/2 + offs_x*32,screen_height/2+offs_y*32,32,32)
   love.graphics.setColor(0xFF,0xFF,0xFF)
   love.graphics.draw(tilesets[2].image,tilesets[2][1],screen_width/2,screen_height/2)
   
@@ -695,7 +695,8 @@ function love.draw()
         local pos_x = (dungeons[active_dungeon].goal.x -player.pos.x)*32 + screen_width/2
         local pos_y = (dungeons[active_dungeon].goal.y -player.pos.y)*32 + screen_height/2
         
-        love.graphics.rectangle("fill",pos_x,pos_y,32,32)
+       -- love.graphics.rectangle("fill",pos_x,pos_y,32,32)
+        love.graphics.draw(tilesets[1].image,tilesets[1][23],pos_x,pos_y)
     end
     
     
@@ -749,6 +750,13 @@ function love.keypressed(key,code)
     --TODO: later trigger the menu on its own not in the debug menue ...
      ui.SetGroupVisible("menue",d.show())
   end
+  if key == "9" then
+    
+    local fi = io.open("strange_seeds.txt","a")
+    fi:write(love.math.getRandomSeed().." strange dungeon\n")
+    io.close(fi)
+  end
+  
   
   if key == "w" then
     offs_y = offs_y -1
@@ -762,6 +770,11 @@ function love.keypressed(key,code)
        print("reset not supported")
       end
   end
+  
+  if key == "escape" then
+      love.event.quit()
+  end
+  
 end
 
 function love.mousepressed(x,y,but,touch)
