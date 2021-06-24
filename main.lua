@@ -53,7 +53,7 @@ local goal_room   = 0
 
 local dungeon = DungeonCreator
 
-local last_key = "enter"
+local last_key = "space"
 
 local options = {
     {"new_game","load_game","options","exit"},
@@ -195,8 +195,8 @@ function love.load()
   
   --load resources
   shdr_minimap = minimap.getShader()
-  shdr_effects = effects.getGreyShader()
-  shdr_blur    = effects.getBlurShader()
+  --shdr_effects = effects.getGreyShader()
+  --shdr_blur    = effects.getBlurShader()
   shdr_light   = effects.getLightShader()
   
   --send the default shader values
@@ -614,7 +614,7 @@ local function draw_minimap()
   love.graphics.setColor(255,255,255,255)
   
   --draw the minimap (scaled from the big map and added a shader)
-  love.graphics.scale(0.5,0.5)
+  love.graphics.scale(1,1)
   love.graphics.translate( dungeons[active_dungeon].map_min_x or 0, dungeons[active_dungeon].map_min_y or 0)
     love.graphics.setShader(shdr_minimap)
       love.graphics.draw(dungeons[active_dungeon].minimap_canv,0,0)

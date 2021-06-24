@@ -4,7 +4,8 @@ local BASE = (...)
 print(BASE)
 
 local string_2 = [[
-vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords ){
+vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords )
+{
   vec4 pixel = Texel(texture, texture_coords );//This is the current pixel color
   number average = (pixel.r+pixel.b+pixel.g)/3.0;
   pixel.r = average;
@@ -16,31 +17,31 @@ vec4 effect( vec4 color, Image texture, vec2 texture_coords, vec2 screen_coords 
 
 local string_3 = [[
 vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
-		{
+{
 
-		number pW = 1/love_ScreenSize.x;//pixel width 
-		number pH = 1/love_ScreenSize.y;//pixel height
+    number pW = 1/love_ScreenSize.x;//pixel width 
+    number pH = 1/love_ScreenSize.y;//pixel height
 
-		vec4 pixel = Texel(texture, texture_coords );//This is the current pixel 
+    vec4 pixel = Texel(texture, texture_coords );//This is the current pixel 
 
-		vec2 coords = vec2(texture_coords.x-pW,texture_coords.y);
-		vec4 Lpixel = Texel(texture, coords );//Pixel on the left
+    vec2 coords = vec2(texture_coords.x-pW,texture_coords.y);
+    vec4 Lpixel = Texel(texture, coords );//Pixel on the left
 
-		coords = vec2(texture_coords.x+pW,texture_coords.y);
-		vec4 Rpixel = Texel(texture, coords );//Pixel on the right
+    coords = vec2(texture_coords.x+pW,texture_coords.y);
+    vec4 Rpixel = Texel(texture, coords );//Pixel on the right
 
-		coords = vec2(texture_coords.x,texture_coords.y-pH);
-		vec4 Upixel = Texel(texture, coords );//Pixel on the up
+    coords = vec2(texture_coords.x,texture_coords.y-pH);
+    vec4 Upixel = Texel(texture, coords );//Pixel on the up
 
-		coords = vec2(texture_coords.x,texture_coords.y+pH);
-		vec4 Dpixel = Texel(texture, coords );//Pixel on the down
+    coords = vec2(texture_coords.x,texture_coords.y+pH);
+    vec4 Dpixel = Texel(texture, coords );//Pixel on the down
 
-		pixel.a += 10 * 0.0166667 * (Lpixel.a + Rpixel.a + Dpixel.a * 3 + Upixel.a - 6 * pixel.a);
+    pixel.a += 10 * 0.0166667 * (Lpixel.a + Rpixel.a + Dpixel.a * 3 + Upixel.a - 6 * pixel.a);
 
-		pixel.rgb = vec3(1.0,1.0,1.0);
+    pixel.rgb = vec3(1.0,1.0,1.0);
 
 
-		return pixel;}
+    return pixel;}
 ]]
 
 
@@ -51,7 +52,7 @@ local string_4 = [[
     vec4 effect(vec4 color, Image texture, vec2 texture_coords, vec2 pixel_coords)
     {
         vec4 pixel = Texel(texture, texture_coords );//This is the current pixel color
-          float num =  10f/distance(vec2(love_ScreenSize.x/2+16,love_ScreenSize.y/2+16) ,vec2(pixel_coords.x,pixel_coords.y));
+          float num =  10.f/distance(vec2(love_ScreenSize.x/2+16,love_ScreenSize.y/2+16) ,vec2(pixel_coords.x,pixel_coords.y));
           num = smoothstep(min,max,num);
           pixel.r = pixel.r * num ;
           pixel.g = pixel.g * num ;
